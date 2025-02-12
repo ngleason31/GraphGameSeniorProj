@@ -126,22 +126,27 @@ def welcomeScreen():
         #Draw Buttons
         if draw_button(screen, "Player 1", button1_rect, gray, black):
             print("Player 1 button clicked!")
+            selectedOption = "player 1"
             running = False
 
         if draw_button(screen, "Player 2", button2_rect, gray, black):
             print("Player 2 button clicked!")
+            selectedOption = "player 2"
             running = False
 
         if draw_button(screen, "Settings", button3_rect, gray, black):
             print("Settings button clicked!")
+            selectedOption = "settings"
             running = False
 
         if draw_button(screen, "Credits", button4_rect, gray, black):  
             print("Credits button clicked!")
+            selectedOption = "credits"
             running = False
 
         #Update Display
         pygame.display.flip()
         clock.tick(60)
+    return selectedOption
 
 welcomeScreen()
