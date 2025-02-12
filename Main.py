@@ -3,6 +3,7 @@ import sys
 from Planet import Planet
 from pygame.locals import *
 import StartScreen
+import Credits
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -29,20 +30,28 @@ def runGame():
         pygame.display.update()
         FramePerSec.tick(FPS)
 
-    pygame.quit()
-    sys.exit()
-
+    return
 
 def main():
-    option = StartScreen.welcomeScreen()
-    print("User Selected: ", option)
-    runGame()
-    if option in ["player1", "player2"]:
-        runGame()
-    else:
-        print("Other option selected. Exiting for now.")
-        pygame.quit()
-        sys.exit()
+    while True:
+        option = StartScreen.welcomeScreen()
+        print("User Selected: ", option)
+
+        if option in ["player1", "player2"]:
+            runGame()
+        elif option == "credits":
+            print("Credits selected. ")
+            ret = Credits.runCredits()
+        
+        elif option == "settings":
+            # Show the settings screen, etc.
+            pass
+
+        elif option == "quit" or option is None:
+            print("Quitting game. ")
+            pygame.quit()
+            sys.exit()
+    
 
 if __name__ == "__main__":
     main()
