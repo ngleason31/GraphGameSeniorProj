@@ -23,8 +23,8 @@ orange = (255, 165, 0)
 blue = (0, 0, 255)
 
 #Font
-welcomeFont = pygame.font.Font(None, 50)
-graphGameFont = pygame.font.Font(None, 120)
+welcomeFont = pygame.font.Font(None, 60)
+graphGameFont = pygame.font.Font(None, 150)
 buttonFont = pygame.font.Font(None, 24)
 
 #Buttons
@@ -99,7 +99,7 @@ def welcomeScreen():
         screen.fill(gray)
 
         #Welcome Banner
-        welcomeTo = "__________ WELCOME TO: __________"
+        welcomeTo = "_________ WELCOME TO _________"
         graphGame =  "GRAPH GAME"
         welcome_text = welcomeFont.render(welcomeTo, True, white)
         welcome_text1 = graphGameFont.render(graphGame, True, white)
