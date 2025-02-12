@@ -1,13 +1,10 @@
 import pygame
 import sys
+import GlobalSettings
 
-def runCredits():
-    pygame.init()
+def runCredits(screen, WIDTH, HEIGHT):
+    #pygame.init()
     # Set up a screen for the credits. Adjust WIDTH/HEIGHT as needed.
-    infoObject = pygame.display.Info()
-    WIDTH = infoObject.current_w
-    HEIGHT = infoObject.current_h
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Credits")
     
     clock = pygame.time.Clock()
@@ -37,7 +34,11 @@ def runCredits():
             if event.type == pygame.QUIT:
                 return "quit" 
 
-        screen.fill((0, 0, 0))
+        if GlobalSettings.dark_background:
+            bg_color = (50, 50, 50)
+        else:
+            bg_color = (200, 200, 200)
+        screen.fill(bg_color)
 
         # Render and draw each line of the credits.
         for index, line in enumerate(credits):
@@ -62,10 +63,13 @@ def runCredits():
     while waiting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                return "quit"
         
-        screen.fill((0, 0, 0))
+        if GlobalSettings.dark_background:
+            bg_color = (50, 50, 50)
+        else:
+            bg_color = (200, 200, 200)
+        screen.fill(bg_color)
 
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()

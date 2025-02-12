@@ -3,15 +3,17 @@ import time
 import turtle
 import math
 import sys
+import GlobalSettings
 from pygame.locals import *
+
 
 pygame.init()   
  
  #Screen Dimensions
-infoObject = pygame.display.Info()
-screenWidth = infoObject.current_w
-screenHeight = infoObject.current_h
-screen = pygame.display.set_mode((screenWidth, screenHeight))
+# infoObject = pygame.display.Info()
+# screenWidth = infoObject.current_w
+# screenHeight = infoObject.current_h
+# screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Welcome Screen")
 
 #Colors
@@ -48,7 +50,7 @@ def draw_button(surface, text, rect, inactive_color, active_color):
     return False
 
 
-def welcomeScreen():
+def welcomeScreen(screen, screenWidth, screenHeight):
     clock = pygame.time.Clock()
     running = True
 
@@ -96,7 +98,11 @@ def welcomeScreen():
             
 
         #Clear Screen
-        screen.fill(gray)
+        if GlobalSettings.dark_background:
+            bg_color = (50, 50, 50)
+        else:
+            bg_color = (200, 200, 200)
+        screen.fill(bg_color)
 
         #Welcome Banner
         welcomeTo = "_________ WELCOME TO _________"
@@ -147,6 +153,6 @@ def welcomeScreen():
         #Update Display
         pygame.display.flip()
         clock.tick(60)
+
     return selectedOption
 
-welcomeScreen()

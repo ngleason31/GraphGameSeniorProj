@@ -4,6 +4,8 @@ from Planet import Planet
 from pygame.locals import *
 import StartScreen
 import Credits
+import Settings
+import GlobalSettings
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -24,7 +26,12 @@ def runGame():
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
-                running = False
+                return "quit"
+        # Use global background setting for the game.
+        if GlobalSettings.dark_background:
+            bg_color = (35, 35, 35)
+        else:
+            bg_color = (220, 220, 220)
         screen.fill((35, 35, 35)) 
         planet1.draw(screen)  
         pygame.display.update()
@@ -32,25 +39,36 @@ def runGame():
 
     return
 
-def main():
-    while True:
-        option = StartScreen.welcomeScreen()
-        print("User Selected: ", option)
+def main(): 
+    running = True
+    while running:
+        pygame.display.set_caption("Graph Game")
+        pygame.event.clear()
 
-        if option in ["player1", "player2"]:
-            runGame()
-        elif option == "credits":
-            print("Credits selected. ")
-            ret = Credits.runCredits()
-        
-        elif option == "settings":
-            # Show the settings screen, etc.
-            pass
+        while pygame.mouse.get_pressed()[0]:
+            pygame.event.pump()  # Process internal actions.
+            pygame.time.delay(10)
+        # Show welcome screen and wait for the user to select an option.
+        option = StartScreen.welcomeScreen(screen, WIDTH, HEIGHT)
+        print("User Selected:", option)
+  
+        if option in ["player 1", "player 2"]:
+            res = runGame()
+            if res == "quit":
+                running = False
+        elif option.lower() == "credits":
+            ret = Credits.runCredits(screen, WIDTH, HEIGHT)
+            if ret == "quit":
+                running = False
+        elif option.lower() == "settings":
+            ret = Settings.runSettings(screen, WIDTH, HEIGHT)
+            if ret == "quit":
+                running = False
+        elif option.lower() == "quit" or option is None:
+            running = False
 
-        elif option == "quit" or option is None:
-            print("Quitting game. ")
-            pygame.quit()
-            sys.exit()
+    pygame.quit()
+    sys.exit()
     
 
 if __name__ == "__main__":
