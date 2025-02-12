@@ -7,10 +7,10 @@ import StartScreen
 pygame.init()
 vec = pygame.math.Vector2
  
-HEIGHT = 800
-WIDTH = 1000
+infoObject = pygame.display.Info()
+WIDTH = infoObject.current_w
+HEIGHT = infoObject.current_h
 FPS = 60
- 
 FramePerSec = pygame.time.Clock()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -28,7 +28,7 @@ def runGame():
         planet1.draw(screen)  
         pygame.display.update()
         FramePerSec.tick(FPS)
-        
+
     pygame.quit()
     sys.exit()
 
