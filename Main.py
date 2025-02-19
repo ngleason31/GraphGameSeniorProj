@@ -1,39 +1,77 @@
 import pygame
 import Planet
 import Ship
+import sys
+from Planet import Planet
 from pygame.locals import *
+import StartScreen
+import Credits
+import Settings
+import GlobalSettings
 
 pygame.init()
 vec = pygame.math.Vector2
  
-HEIGHT = 800
-WIDTH = 1000
+infoObject = pygame.display.Info()
+WIDTH = infoObject.current_w
+HEIGHT = infoObject.current_h
 FPS = 60
- 
 FramePerSec = pygame.time.Clock()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Graph Game")
+clock = pygame.time.Clock()
 
-planet1 = Planet.Planet(400, 400)
-ship1 = Ship.Ship(100, 100)
+def runGame():
+    planet1 = Planet(400, 400)
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return "quit"
+        # Use global background setting for the game.
+        if GlobalSettings.dark_background:
+            bg_color = (35, 35, 35)
+        else:
+            bg_color = (220, 220, 220)
+        screen.fill((35, 35, 35)) 
+        planet1.draw(screen)  
+        pygame.display.update()
+        FramePerSec.tick(FPS)
 
+    return
 
-running = True
-while running:
-    screen.fill((35, 35, 35)) 
-    planet1.draw(screen)
-    ship1.update_position()
-    ship1.draw(screen)
-    
-    for event in pygame.event.get():
-        if event.type == QUIT:
+def main(): 
+    running = True
+    while running:
+        pygame.display.set_caption("Graph Game")
+        pygame.event.clear()
+
+        while pygame.mouse.get_pressed()[0]:
+            pygame.event.pump()  # Process internal actions.
+            pygame.time.delay(10)
+        # Show welcome screen and wait for the user to select an option.
+        option = StartScreen.welcomeScreen(screen, WIDTH, HEIGHT)
+        print("User Selected:", option)
+  
+        if option in ["player 1", "player 2"]:
+            res = runGame()
+            if res == "quit":
+                running = False
+        elif option.lower() == "credits":
+            ret = Credits.runCredits(screen, WIDTH, HEIGHT)
+            if ret == "quit":
+                running = False
+        elif option.lower() == "settings":
+            ret = Settings.runSettings(screen, WIDTH, HEIGHT)
+            if ret == "quit":
+                running = False
+        elif option.lower() == "quit" or option is None:
             running = False
-        elif event.type == MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            ship1.set_target(*mouse_pos)
 
-    pygame.display.update()
-    FramePerSec.tick(FPS)
+    pygame.quit()
+    sys.exit()
+    
 
-pygame.quit()
+if __name__ == "__main__":
+    main()
