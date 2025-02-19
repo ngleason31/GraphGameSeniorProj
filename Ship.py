@@ -1,21 +1,22 @@
 import pygame
 import sys
 import math
+import GlobalSettings
 
 
 class Ship:
-    def __init__(self, x, y, color=(255, 191, 0), size=10, speed=5):
+    def __init__(self, x, y, player=0, size=10, speed=5):
         self.x = x
         self.y = y
         self.pos = pygame.Vector2(x, y)
-        self.color = color
+        self.player = player
         self.size = size
         self.speed = speed
         self.curr_target = self.pos
 
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
-        pygame.draw.polygon(screen, self.color, triangle_points, width=6)
+        pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=6)
     
     def get_position(self):
         return (self.x, self.y)

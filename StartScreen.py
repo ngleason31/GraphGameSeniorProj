@@ -99,16 +99,18 @@ def welcomeScreen(screen, screenWidth, screenHeight):
 
         #Clear Screen
         if GlobalSettings.dark_background:
-            bg_color = (50, 50, 50)
+            bg_color = GlobalSettings.dark_mode_bg
+            detail_color = GlobalSettings.dark_mode_details
         else:
-            bg_color = (200, 200, 200)
+            bg_color = GlobalSettings.light_mode_bg
+            detail_color = GlobalSettings.light_mode_details
         screen.fill(bg_color)
 
         #Welcome Banner
         welcomeTo = "_________ WELCOME TO _________"
         graphGame =  "GRAPH GAME"
-        welcome_text = welcomeFont.render(welcomeTo, True, white)
-        welcome_text1 = graphGameFont.render(graphGame, True, white)
+        welcome_text = welcomeFont.render(welcomeTo, True, detail_color)
+        welcome_text1 = graphGameFont.render(graphGame, True, detail_color)
         welcome_react = welcome_text.get_rect(center=(screenWidth // 2, welcomeY - 100))
         welcome_react1 = welcome_text1.get_rect(center=(screenWidth // 2, welcomeY - 20))
         screen.blit(welcome_text, welcome_react)

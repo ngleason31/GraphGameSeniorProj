@@ -58,12 +58,12 @@ def runGame():
                         y_offset = random.randint(-30, 30)
                         ship.set_target(mouse_x + x_offset, mouse_y + y_offset)
                 if event.button == 3:
-                    ships.append(Ship(mouse_x, mouse_y))
-            #Use global background setting for the game.
+                    ships.append(Ship(mouse_x, mouse_y, player=curr_player))
+        #Use global background setting for the game.
         if GlobalSettings.dark_background:
-            bg_color = (35, 35, 35)
+            bg_color = GlobalSettings.dark_mode_bg
         else:
-            bg_color = (220, 220, 220)
+            bg_color = GlobalSettings.light_mode_bg
 
         screen.fill(bg_color) 
         for planet in planets:

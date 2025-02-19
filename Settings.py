@@ -38,6 +38,7 @@ def runSettings(screen, WIDTH, HEIGHT):
                     # Toggle Background: update global variable
                     if bg_button_rect.collidepoint(mouse):
                         GlobalSettings.dark_background = not GlobalSettings.dark_background
+                        GlobalSettings.reload_player_colors()
                     # Return to home if return button is clicked
                     if return_button_rect.collidepoint(mouse):
                         running = False
@@ -49,9 +50,9 @@ def runSettings(screen, WIDTH, HEIGHT):
 
             # Use the global background setting for the color.
             if GlobalSettings.dark_background:
-                bg_color = (50, 50, 50)
+                bg_color = GlobalSettings.dark_mode_bg
             else:
-                bg_color = (200, 200, 200)
+                bg_color = GlobalSettings.light_mode_bg
             screen.fill(bg_color)
 
             # Draw Audio toggle button

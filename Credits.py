@@ -35,15 +35,17 @@ def runCredits(screen, WIDTH, HEIGHT):
                 return "quit" 
 
         if GlobalSettings.dark_background:
-            bg_color = (50, 50, 50)
+            bg_color = GlobalSettings.dark_mode_bg
+            text_color = GlobalSettings.dark_mode_details
         else:
-            bg_color = (200, 200, 200)
+            bg_color = GlobalSettings.light_mode_bg
+            text_color = GlobalSettings.light_mode_details
         screen.fill(bg_color)
 
         # Render and draw each line of the credits.
         for index, line in enumerate(credits):
             font = pygame.font.Font(None, 36)
-            text_surface = font.render(line, True, (255, 255, 255))
+            text_surface = font.render(line, True, text_color)
             text_rect = text_surface.get_rect(center=(WIDTH // 2, y_offset + index * 40))
             screen.blit(text_surface, text_rect)
 
@@ -66,9 +68,9 @@ def runCredits(screen, WIDTH, HEIGHT):
                 return "quit"
         
         if GlobalSettings.dark_background:
-            bg_color = (50, 50, 50)
+            bg_color = GlobalSettings.dark_mode_bg
         else:
-            bg_color = (200, 200, 200)
+            bg_color = GlobalSettings.light_mode_bg
         screen.fill(bg_color)
 
         mouse = pygame.mouse.get_pos()
