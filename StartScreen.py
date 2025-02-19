@@ -117,19 +117,19 @@ def welcomeScreen(screen, screenWidth, screenHeight):
         screen.blit(welcome_text1, welcome_react1)
 
         #Press to Start
-        start_text = welcomeFont.render("Press to Start:", True, white)
+        start_text = welcomeFont.render("Press to Start:", True, detail_color)
         start_react = start_text.get_rect(center=(screenWidth // 2, welcomeY + 300))
         screen.blit(start_text, start_react)
 
         #Draw Triangle 1
         triangle1 = rotateTriangle(base_triangle, angle1)
         triangle1_points = [(triangle_center1[0] + x, triangle_center1[1] + y) for x, y in triangle1]
-        pygame.draw.polygon(screen, orange, triangle1_points)
+        pygame.draw.polygon(screen, orange, triangle1_points, width=6)
 
         #Draw Triangle 2
         triangle2 = rotateTriangle(base_triangle, angle2)
         triangle2_points = [(triangle_center2[0] + x, triangle_center2[1] + y) for x, y in triangle2]
-        pygame.draw.polygon(screen, blue, triangle2_points)
+        pygame.draw.polygon(screen, blue, triangle2_points, width=6)
 
         #Draw Buttons
         if draw_button(screen, "Player 1", button1_rect, gray, black):
