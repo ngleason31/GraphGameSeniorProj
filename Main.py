@@ -23,6 +23,7 @@ FramePerSec = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
+curr_player = 0
 
 def planet_generator():
     planets = []
@@ -35,6 +36,7 @@ def planet_generator():
         planets.append(Planet(x, y, radius))
         
     player_planet = random.randint(0, num_planets - 1)
+    planets[player_planet].change_player(curr_player)
         
     return planets
 
@@ -78,6 +80,7 @@ def runGame():
 def main(): 
     running = True
     while running:
+        global curr_player
         pygame.display.set_caption("Graph Game")
         pygame.event.clear()
 
@@ -88,7 +91,13 @@ def main():
         option = StartScreen.welcomeScreen(screen, WIDTH, HEIGHT)
         print("User Selected:", option)
   
-        if option in ["player 1", "player 2"]:
+        if option.lower() in "player 1":
+            curr_player = 1
+            res = runGame()
+            if res == "quit":
+                running = False
+        elif option.lower() in "player 2":
+            curr_player = 2
             res = runGame()
             if res == "quit":
                 running = False
