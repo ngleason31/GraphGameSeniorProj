@@ -1,8 +1,10 @@
 import pygame
 import Planet
 import Ship
+import random
 import sys
 from Planet import Planet
+from Ship import Ship
 from pygame.locals import *
 import StartScreen
 import Credits
@@ -22,20 +24,52 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 
+def planet_generator():
+    planets = []
+    num_planets = random.randint(5, 10)
+    
+    for _ in range(num_planets):
+        radius = random.randint(30, 80)
+        x = random.randint(100, WIDTH - 100)
+        y = random.randint(100, HEIGHT - 100)
+        planets.append(Planet(x, y, radius))
+        
+    player_planet = random.randint(0, num_planets - 1)
+        
+    return planets
+
 def runGame():
-    planet1 = Planet(400, 400)
+    planets = planet_generator()
+    ships = []
+
     running = True
     while running:
+        
         for event in pygame.event.get():
             if event.type == QUIT:
-                return "quit"
-        # Use global background setting for the game.
+                running = False
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if event.button == 1:
+                    for ship in ships:
+                        x_offset = random.randint(-30, 30)
+                        y_offset = random.randint(-30, 30)
+                        ship.set_target(mouse_x + x_offset, mouse_y + y_offset)
+                if event.button == 3:
+                    ships.append(Ship(mouse_x, mouse_y))
+            #Use global background setting for the game.
         if GlobalSettings.dark_background:
             bg_color = (35, 35, 35)
         else:
             bg_color = (220, 220, 220)
-        screen.fill((35, 35, 35)) 
-        planet1.draw(screen)  
+
+        screen.fill(bg_color) 
+        for planet in planets:
+            planet.draw(screen)
+        for ship in ships:
+            ship.update_position()
+            ship.draw(screen)
+            
         pygame.display.update()
         FramePerSec.tick(FPS)
 
