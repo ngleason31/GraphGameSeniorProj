@@ -13,21 +13,13 @@ class Ship:
         self.size = size
         self.speed = speed
         self.curr_target = self.pos
-
+        
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
         pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=6)
     
     def get_position(self):
         return (self.x, self.y)
-        
-    def rotate(self, mouseX, mouseY):
-        dx = mouseX - self.x
-        dy = mouseY - self.y
-        angle = math.atan2(dy, dx) - math.pi / 2
-        cos_a = math.cos(angle)
-        sin_a = math.sin(angle)
-        self.triangle_points = [(self.x + x * cos_a - y * sin_a, self.y + x * sin_a + y * cos_a) for (x, y) in self.triangle_points]
         
     def set_target(self, x, y):
         self.curr_target = pygame.Vector2(x, y)

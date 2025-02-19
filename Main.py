@@ -56,7 +56,7 @@ def runGame():
                     for ship in ships:
                         x_offset = random.randint(-30, 30)
                         y_offset = random.randint(-30, 30)
-                        ship.set_target(mouse_x + x_offset, mouse_y + y_offset)
+                        ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
                 if event.button == 3:
                     ships.append(Ship(mouse_x, mouse_y, player=curr_player))
         #Use global background setting for the game.
