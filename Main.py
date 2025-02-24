@@ -1,9 +1,8 @@
 import pygame
-import Planet
-import Ship
 import random
 import sys
 from Planet import Planet
+from Scoreboard import Scoreboard
 from Ship import Ship
 from pygame.locals import *
 import StartScreen
@@ -14,13 +13,15 @@ import GlobalSettings
 pygame.init()
 vec = pygame.math.Vector2
  
+ 
 infoObject = pygame.display.Info()
-WIDTH = infoObject.current_w
-HEIGHT = infoObject.current_h
+GlobalSettings.WIDTH = infoObject.current_w
+GlobalSettings.HEIGHT = infoObject.current_h
+
 FPS = 60
 FramePerSec = pygame.time.Clock()
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 curr_player = 0
@@ -31,8 +32,8 @@ def planet_generator():
     
     for _ in range(num_planets):
         radius = random.randint(30, 80)
-        x = random.randint(100, WIDTH - 100)
-        y = random.randint(100, HEIGHT - 100)
+        x = random.randint(100, GlobalSettings.WIDTH - 100)
+        y = random.randint(100, GlobalSettings.HEIGHT - 100)
         planets.append(Planet(x, y, radius))
         
     player_planet = random.randint(0, num_planets - 1)
@@ -43,6 +44,10 @@ def planet_generator():
 def runGame():
     planets = planet_generator()
     ships = []
+    scoreboard = Scoreboard()
+    
+    SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
+    pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
     running = True
     while running:
@@ -57,8 +62,12 @@ def runGame():
                         x_offset = random.randint(-30, 30)
                         y_offset = random.randint(-30, 30)
                         ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
-                if event.button == 3:
+                if event.button == 3 and scoreboard.player_score >= 50:
                     ships.append(Ship(mouse_x, mouse_y, player=curr_player))
+                    scoreboard.update_player(-50)
+            elif event.type == SCORE_UPDATE_EVENT:
+                scoreboard.update() 
+                
         #Use global background setting for the game.
         if GlobalSettings.dark_background:
             bg_color = GlobalSettings.dark_mode_bg
@@ -72,6 +81,8 @@ def runGame():
             ship.update_position()
             ship.draw(screen)
             
+        scoreboard.draw(screen)
+        
         pygame.display.update()
         FramePerSec.tick(FPS)
 
@@ -88,7 +99,7 @@ def main():
             pygame.event.pump()  # Process internal actions.
             pygame.time.delay(10)
         # Show welcome screen and wait for the user to select an option.
-        option = StartScreen.welcomeScreen(screen, WIDTH, HEIGHT)
+        option = StartScreen.welcomeScreen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
         print("User Selected:", option)
   
         if option.lower() in "player 1":
@@ -102,11 +113,11 @@ def main():
             if res == "quit":
                 running = False
         elif option.lower() == "credits":
-            ret = Credits.runCredits(screen, WIDTH, HEIGHT)
+            ret = Credits.runCredits(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             if ret == "quit":
                 running = False
         elif option.lower() == "settings":
-            ret = Settings.runSettings(screen, WIDTH, HEIGHT)
+            ret = Settings.runSettings(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             if ret == "quit":
                 running = False
         elif option.lower() == "quit" or option is None:

@@ -1,5 +1,10 @@
+
+
 audio_on = True          
 dark_background = True 
+
+WIDTH = 0
+HEIGHT = 0
 
 
 
