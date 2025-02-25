@@ -60,7 +60,7 @@ def runGame():
 
         screen.fill(bg_color) 
         for planet in planets:
-            planet.draw(screen)
+            planet.draw(screen, planets)
         for ship in ships:
             ship.update_position()
             ship.draw(screen)
