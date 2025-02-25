@@ -6,6 +6,9 @@ dark_background = True
 WIDTH = 0
 HEIGHT = 0
 
+curr_player = 0
+opposing_player = 0
+
 
 
 #Dark Mode Colors
