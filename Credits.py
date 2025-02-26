@@ -3,7 +3,6 @@ import sys
 import GlobalSettings
 
 def runCredits(screen, WIDTH, HEIGHT):
-    #pygame.init()
     # Set up a screen for the credits. Adjust WIDTH/HEIGHT as needed.
     pygame.display.set_caption("Credits")
     

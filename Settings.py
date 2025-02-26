@@ -79,7 +79,6 @@ def runSettings(screen, WIDTH, HEIGHT):
             screen.blit(audio_surface, audio_rect)
 
             # Draw Background toggle button
-            # Draw Background toggle button
             bg_text = "Background: Dark" if GlobalSettings.dark_background else "Background: Light"
             bg_surface = font.render(bg_text, True, (255, 255, 255))
             bg_rect = bg_surface.get_rect(center=bg_button_rect.center)

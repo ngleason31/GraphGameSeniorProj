@@ -8,10 +8,6 @@ from pygame.locals import *
 pygame.init()   
  
 #Screen Dimensions
-# infoObject = pygame.display.Info()
-# screenWidth = infoObject.current_w
-# screenHeight = infoObject.current_h
-# screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Welcome Screen")
 
 #Colors
