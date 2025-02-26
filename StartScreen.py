@@ -1,6 +1,4 @@
 import pygame
-import time
-import turtle
 import math
 import sys
 import GlobalSettings
