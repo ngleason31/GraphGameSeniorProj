@@ -1,9 +1,10 @@
 import pygame
 import GlobalSettings
+import random
 
 
 class Ship:
-    def __init__(self, x, y, player=0, size=10, speed=5):
+    def __init__(self, x, y, curr_planet, player=0, size=10, speed=5):
         self.x = x
         self.y = y
         self.pos = pygame.Vector2(x, y)
@@ -11,6 +12,7 @@ class Ship:
         self.size = size
         self.speed = speed
         self.curr_target = self.pos
+        self.curr_planet = curr_planet
         
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
@@ -19,7 +21,12 @@ class Ship:
     def get_position(self):
         return (self.x, self.y)
         
-    def set_target(self, x, y):
+    def set_target(self, planet):
+        self.curr_planet = planet.id
+        x_offset = random.randint(planet.radius, planet.radius + 5)
+        y_offset = random.randint(planet.radius, planet.radius + 5)
+        x = planet.x + x_offset
+        y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)
     
     def update_position(self):

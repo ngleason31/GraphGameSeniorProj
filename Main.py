@@ -41,15 +41,18 @@ def runGame():
                 running = False
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
+                planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
                     for ship in ships:
-                        if planet_loc(mouse_x, mouse_y) != None:
-                            x_offset = random.randint(-30, 30)
-                            y_offset = random.randint(-30, 30)
-                            ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
+                        if planet != None and planet.id in planets[ship.curr_planet].connections:
+                            ship.set_target(planet)                     
                 if event.button == 3 and scoreboard.player_score >= 50:
-                    if planet_loc(mouse_x, mouse_y) != None:
-                        ships.append(Ship(mouse_x, mouse_y, player=GlobalSettings.curr_player))
+                    if planet != None and planet.player_num == GlobalSettings.curr_player:
+                        x_offset = random.randint(planet.radius, planet.radius + 5)
+                        y_offset = random.randint(planet.radius, planet.radius + 5)
+                        x = mouse_x + x_offset
+                        y = mouse_y + y_offset
+                        ships.append(Ship(x, y, planet.id, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-50)
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update() 

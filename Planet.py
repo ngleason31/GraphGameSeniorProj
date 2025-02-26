@@ -117,5 +117,14 @@ def planet_BFS(start, goal, planets):
                 stack.append(planets[connection])
                 
     return False
+
+#Function to check if a certain x, y is in a planet (square hitbox for simplicity)
+def planet_loc(x, y, planets):
+    for planet in planets:
+        if (x <= planet.x + planet.radius and x >= planet.x - planet.radius
+        and y <= planet.y + planet.radius and y >= planet.y - planet.radius):
+            return planet
+    
+    return None
         
     
