@@ -12,6 +12,8 @@ class Planet:
         self.color = GlobalSettings.player_colors[player]
         self.player_num = player
         self.connections = []
+        # Assign a random point value between 0 and 75 to the planet.
+        self.point_value = random.randint(1, 75)
         
     def change_player(self, player_num):
         self.player_num = player_num
@@ -20,6 +22,11 @@ class Planet:
     def draw(self, screen, planets):
         #Drawing the planet itself
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius, width=6)
+        # Draw the point value on the planet
+        font = pygame.font.Font(None, 24)
+        text = font.render(str(self.point_value), True, GlobalSettings.neutral_color)
+        text_rect = text.get_rect(center=(self.x, self.y))
+        screen.blit(text, text_rect)
         for connection in self.connections:
             #Calculating start points on edge of circle
             connecting_planet = planets[connection]
