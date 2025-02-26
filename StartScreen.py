@@ -7,7 +7,7 @@ from pygame.locals import *
 
 pygame.init()   
  
- #Screen Dimensions
+#Screen Dimensions
 # infoObject = pygame.display.Info()
 # screenWidth = infoObject.current_w
 # screenHeight = infoObject.current_h
@@ -130,12 +130,12 @@ def welcomeScreen(screen, screenWidth, screenHeight):
         pygame.draw.polygon(screen, blue, triangle2_points, width=6)
 
         #Draw Buttons
-        if draw_button(screen, "Player 1", button1_rect, gray, black):
+        if draw_button(screen, "1 Player", button1_rect, gray, black):
             print("Player 1 button clicked!")
             selectedOption = "player 1"
             running = False
 
-        if draw_button(screen, "Player 2", button2_rect, gray, black):
+        if draw_button(screen, "2 Players", button2_rect, gray, black):
             print("Player 2 button clicked!")
             selectedOption = "player 2"
             running = False

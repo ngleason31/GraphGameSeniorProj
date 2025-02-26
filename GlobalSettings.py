@@ -1,15 +1,19 @@
-
-
 audio_on = True          
 dark_background = True 
 
 WIDTH = 0
 HEIGHT = 0
 
+#Colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+gray = (150, 150, 150)
+light_gray = (200, 200, 200)
+orange = (255, 165, 0)
+blue = (0, 0, 255)
+
 curr_player = 0
 opposing_player = 0
-
-
 
 #Dark Mode Colors
 dark_mode_bg = (80, 80, 80)
