@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-from Planet import planet_generator
+from Planet import planet_generator, planet_loc
 from Scoreboard import Scoreboard
 from Ship import Ship
 from pygame.locals import *
@@ -43,12 +43,14 @@ def runGame():
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if event.button == 1:
                     for ship in ships:
-                        x_offset = random.randint(-30, 30)
-                        y_offset = random.randint(-30, 30)
-                        ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
+                        if planet_loc(mouse_x, mouse_y) != None:
+                            x_offset = random.randint(-30, 30)
+                            y_offset = random.randint(-30, 30)
+                            ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
                 if event.button == 3 and scoreboard.player_score >= 50:
-                    ships.append(Ship(mouse_x, mouse_y, player=GlobalSettings.curr_player))
-                    scoreboard.update_player(-50)
+                    if planet_loc(mouse_x, mouse_y) != None:
+                        ships.append(Ship(mouse_x, mouse_y, player=GlobalSettings.curr_player))
+                        scoreboard.update_player(-50)
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update() 
                 
