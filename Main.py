@@ -9,11 +9,18 @@ import StartScreen
 import Credits
 import Settings
 import GlobalSettings
+from playsound import playsound
 
 pygame.init()
+pygame.mixer.init()
+
+# Load and play the background music
+pygame.mixer.music.load("Audio/gameMusic.mp3")
+pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
+GlobalSettings.update_audio()
+
 vec = pygame.math.Vector2
- 
- 
+
 infoObject = pygame.display.Info()
 GlobalSettings.WIDTH = infoObject.current_w
 GlobalSettings.HEIGHT = infoObject.current_h
@@ -103,6 +110,7 @@ def main():
                 running = False
         elif option.lower() == "settings":
             ret = Settings.runSettings(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            GlobalSettings.update_audio()
             if ret == "quit":
                 running = False
         elif option.lower() == "quit" or option is None:

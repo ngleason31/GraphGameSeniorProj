@@ -34,6 +34,7 @@ def runSettings(screen, WIDTH, HEIGHT):
                     # Toggle Audio: update global variable
                     if audio_button_rect.collidepoint(mouse):
                         GlobalSettings.audio_on = not GlobalSettings.audio_on
+                        GlobalSettings.update_audio()
                     # Toggle Background: update global variable
                     if bg_button_rect.collidepoint(mouse):
                         GlobalSettings.dark_background = not GlobalSettings.dark_background

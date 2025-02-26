@@ -1,3 +1,4 @@
+import pygame
 audio_on = True          
 dark_background = True 
 
@@ -33,3 +34,10 @@ def reload_player_colors():
     
     neutral_color = dark_mode_details if dark_background else light_mode_details
     player_colors = (neutral_color, (255, 165, 0), (0, 0, 255))
+
+#Update Audio
+def update_audio():
+    if audio_on:
+        pygame.mixer.music.unpause()
+    else:
+        pygame.mixer.music.pause()
