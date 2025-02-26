@@ -1,4 +1,6 @@
 import pygame
+
+#Global Variables
 audio_on = True          
 dark_background = True 
 
