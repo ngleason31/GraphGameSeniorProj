@@ -20,7 +20,7 @@ class Planet:
     def draw(self, screen, planets):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius, width=6)
         for connection in self.connections:
-            pygame.draw.line(screen, GlobalSettings.neutral_color, (self.x, self.y), (planets[connection].x, planets[connection].y), 6)
+            pygame.draw.line(screen, GlobalSettings.neutral_color, (self.x, self.y), (planets[connection].x, planets[connection].y), 4)
             
     def add_connection(self, id):
         self.connections.append(id)
@@ -50,37 +50,17 @@ def planet_generator():
                     break
             if planet_found:
                 planets.append(Planet(id + 3, x, y, radius))
+            
+    for first_planet_id in range(num_planets):
+        for second_planet_id in range(first_planet_id + 1, num_planets):
+            first_planet = planets[first_planet_id]
+            second_planet = planets[second_planet_id]
+            distance = math.sqrt((first_planet.x - second_planet.x) ** 2 + (first_planet.y - second_planet.y) ** 2)
+            if distance <= 400:
+                first_planet.add_connection(second_planet_id)
+                second_planet.add_connection(first_planet_id)
                 
-    #Checks if there are any connections for the top left planet
-    has_close_planet = False
-    for id in range(3, num_planets):
-        planet = planets[id]
-        distance = math.sqrt((planet.x - player_planet.x) ** 2 + (planet.y - player_planet.y) ** 2)
-        if distance <= 400:
-            has_close_planet = True
-            player_planet.add_connection(id)
-            planet.add_connection(0)
-        
-    #If no close planets, adds a connection to the center planet
-    if not has_close_planet:
-        player_planet.add_connection(2)
-        center_planet.add_connection(0)
-            
-    #Checks if there are any connections for the bottom right planet
-    has_close_planet = False
-    for id in range(3, num_planets):
-        planet = planets[id]
-        distance = math.sqrt((planet.x - opposing_planet.x) ** 2 + (planet.y - opposing_planet.y) ** 2)
-        if distance <= 400:
-            has_close_planet = True
-            opposing_planet.add_connection(id)
-            planets[id].add_connection(1)
-        
-    #If no close planets, adds a connection to the center planet
-    if not has_close_planet:
-        opposing_planet.add_connection(2)
-        center_planet.add_connection(1)
-            
+                
     #Checks if there are any connections for the center planet
     has_close_planet = False
     for id in range(3, num_planets):
@@ -88,7 +68,7 @@ def planet_generator():
         distance = math.sqrt((planet.x - center_planet.x) ** 2 + (planet.y - center_planet.y) ** 2)
         if distance <= 400:
             has_close_planet = True
-            opposing_planet.add_connection(id)
+            center_planet.add_connection(id)
             planets[id].add_connection(2)
         
     #If no close planets, adds a connection to both top left and bottom right planets
@@ -97,14 +77,32 @@ def planet_generator():
         center_planet.add_connection(1)
         player_planet.add_connection(2)
         opposing_planet.add_connection(2)
-            
-    for first_planet_id in range(3, num_planets):
-        for second_planet_id in range(first_planet_id, num_planets):
-            first_planet = planets[first_planet_id]
-            second_planet = planets[second_planet_id]
-            distance = math.sqrt((first_planet.x - second_planet.x) ** 2 + (first_planet.y - second_planet.y) ** 2)
-        if distance <= 400:
-            first_planet.add_connection(second_planet_id)
-            second_planet.add_connection(first_planet_id)
+    
+    #Makes sure the entire graph is connected
+    if not planet_BFS(player_planet, center_planet, planets):
+        player_planet.add_connection(2)
+        center_planet.add_connection(0)
+        
+    if not planet_BFS(opposing_planet, center_planet, planets):
+        opposing_planet.add_connection(2)
+        center_planet.add_connection(1)
         
     return planets
+
+
+#Helper planet BFS function
+def planet_BFS(start, goal, planets):
+    stack = [start]
+    visited = []
+    
+    while stack:
+        planet = stack.pop(0)
+        visited.append(planet.id)
+        for connection in planet.connections:
+            if planet == goal:
+                return True
+            if connection not in visited:
+                stack.append(planets[connection])
+                
+    return False
+        
