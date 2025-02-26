@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-from Planet import planet_generator
+from Planet import planet_generator, planet_loc
 from Scoreboard import Scoreboard
 from Ship import Ship
 from pygame.locals import *
@@ -67,6 +67,45 @@ def pauseMenu(screen, WIDTH, HEIGHT):
     
     return "resume"
 
+def how_to_play_menu(screen, WIDTH, HEIGHT):
+    instructions = [
+        "How to Play:",
+        "1. Left-click to move your ship.",
+        "2. Right-click (if score >= 50) to spawn a new ship.",
+        "3. Press ESC to pause the game.",
+        "",
+        "Press any key or click to start!"
+    ]
+    
+    clock = pygame.time.Clock()
+    waiting = True
+    font = pygame.font.Font(None, 36)
+    
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
+                waiting = False
+        
+        # Use global background color based on settings
+        bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
+        screen.fill(bg_color)
+        
+        # Draw each line of instructions centered on screen
+        y_offset = HEIGHT // 4
+        for line in instructions:
+            text_surface = font.render(line, True, GlobalSettings.neutral_color)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, y_offset))
+            screen.blit(text_surface, text_rect)
+            y_offset += 40  # Adjust spacing between lines
+        
+        pygame.display.flip()
+        clock.tick(60)
+    
+    return "start"
+
 def runGame():
     planets = planet_generator()
     ships = []
@@ -89,14 +128,19 @@ def runGame():
                         return "home"
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
+                planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
                     for ship in ships:
-                        x_offset = random.randint(-30, 30)
-                        y_offset = random.randint(-30, 30)
-                        ship.set_target(mouse_x + x_offset, mouse_y + y_offset)                     
+                        if planet != None and planet.id in planets[ship.curr_planet].connections:
+                            ship.set_target(planet)                     
                 if event.button == 3 and scoreboard.player_score >= 50:
-                    ships.append(Ship(mouse_x, mouse_y, player=GlobalSettings.curr_player))
-                    scoreboard.update_player(-50)
+                    if planet != None and planet.player_num == GlobalSettings.curr_player:
+                        x_offset = random.randint(planet.radius, planet.radius + 5)
+                        y_offset = random.randint(planet.radius, planet.radius + 5)
+                        x = mouse_x + x_offset
+                        y = mouse_y + y_offset
+                        ships.append(Ship(x, y, planet.id, player=GlobalSettings.curr_player))
+                        scoreboard.update_player(-50)
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update() 
                 
@@ -136,6 +180,7 @@ def main():
         if option.lower() in "player 1":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
+            how_to_play_menu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             res = runGame()
             if res == "quit":
                 running = False
