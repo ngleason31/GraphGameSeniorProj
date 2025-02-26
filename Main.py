@@ -187,6 +187,7 @@ def main():
         elif option.lower() in "player 2":
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
+            how_to_play_menu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             res = runGame()
             if res == "quit":
                 running = False
