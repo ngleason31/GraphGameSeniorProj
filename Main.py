@@ -9,11 +9,18 @@ import StartScreen
 import Credits
 import Settings
 import GlobalSettings
+from playsound import playsound
 
 pygame.init()
+pygame.mixer.init()
+
+# Load and play the background music
+pygame.mixer.music.load("Audio/gameMusic.mp3")
+pygame.mixer.music.play(-1)
+GlobalSettings.update_audio()
+
 vec = pygame.math.Vector2
- 
- 
+
 infoObject = pygame.display.Info()
 GlobalSettings.WIDTH = infoObject.current_w
 GlobalSettings.HEIGHT = infoObject.current_h
@@ -24,6 +31,41 @@ FramePerSec = pygame.time.Clock()
 screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
+
+def pauseMenu(screen, WIDTH, HEIGHT):
+    pause_font = pygame.font.Font(None, 72)
+    option_font = pygame.font.Font(None, 48)
+    pause_text = pause_font.render("Paused", True, GlobalSettings.neutral_color)
+    resume_text = option_font.render("Press R to Resume", True, GlobalSettings.neutral_color)
+    quit_text = option_font.render("Press Q to Quit", True, GlobalSettings.neutral_color)
+    
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "quit"
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:  # Resume game
+                    paused = False
+                elif event.key == pygame.K_q:  # Quit game
+                    return "home"
+        
+        # Fill screen with background color based on current settings
+        bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
+        screen.fill(bg_color)
+        
+        # Draw pause texts
+        pause_rect = pause_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
+        resume_rect = resume_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
+        screen.blit(pause_text, pause_rect)
+        screen.blit(resume_text, resume_rect)
+        screen.blit(quit_text, quit_rect)
+        
+        pygame.display.flip()
+        pygame.time.Clock().tick(30)
+    
+    return "resume"
 
 def runGame():
     planets = planet_generator()
@@ -39,6 +81,12 @@ def runGame():
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    # Call the pause menu
+                    result = pauseMenu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+                    if result == "home":
+                        return "home"
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 planet = planet_loc(mouse_x, mouse_y, planets)
@@ -108,6 +156,7 @@ def main():
                 running = False
         elif option.lower() == "settings":
             ret = Settings.runSettings(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            GlobalSettings.update_audio()
             if ret == "quit":
                 running = False
         elif option.lower() == "quit" or option is None:

@@ -9,7 +9,6 @@ def runSettings(screen, WIDTH, HEIGHT):
     FPS = 60
 
     # Initial settings state
-    audioOn = True
     # darkBackground = True
 
     # Button definitions
@@ -35,6 +34,7 @@ def runSettings(screen, WIDTH, HEIGHT):
                     # Toggle Audio: update global variable
                     if audio_button_rect.collidepoint(mouse):
                         GlobalSettings.audio_on = not GlobalSettings.audio_on
+                        GlobalSettings.update_audio()
                     # Toggle Background: update global variable
                     if bg_button_rect.collidepoint(mouse):
                         GlobalSettings.dark_background = not GlobalSettings.dark_background
@@ -55,22 +55,36 @@ def runSettings(screen, WIDTH, HEIGHT):
                 bg_color = GlobalSettings.light_mode_bg
             screen.fill(bg_color)
 
+            #Change Color on Hover
+            mouse = pygame.mouse.get_pos()
+            if audio_button_rect.collidepoint(mouse):
+                pygame.draw.rect(screen, GlobalSettings.black, audio_button_rect)
+            else:
+                pygame.draw.rect(screen, GlobalSettings.gray, audio_button_rect)
+
+            if bg_button_rect.collidepoint(mouse):
+                pygame.draw.rect(screen, GlobalSettings.black, bg_button_rect)
+            else:
+                pygame.draw.rect(screen, GlobalSettings.gray, bg_button_rect)
+
+            if return_button_rect.collidepoint(mouse):
+                pygame.draw.rect(screen, GlobalSettings.black, return_button_rect)
+            else:
+                pygame.draw.rect(screen, GlobalSettings.gray, return_button_rect)
+
             # Draw Audio toggle button
-            pygame.draw.rect(screen, (150, 150, 150), audio_button_rect)
-            audio_text = "Audio: On" if audioOn else "Audio: Off"
+            audio_text = "Audio: On" if GlobalSettings.audio_on else "Audio: Off"
             audio_surface = font.render(audio_text, True, (255, 255, 255))
             audio_rect = audio_surface.get_rect(center=audio_button_rect.center)
             screen.blit(audio_surface, audio_rect)
 
             # Draw Background toggle button
-            pygame.draw.rect(screen, (150, 150, 150), bg_button_rect)
             bg_text = "Background: Dark" if GlobalSettings.dark_background else "Background: Light"
             bg_surface = font.render(bg_text, True, (255, 255, 255))
             bg_rect = bg_surface.get_rect(center=bg_button_rect.center)
             screen.blit(bg_surface, bg_rect)
 
             # Draw Return to Home button
-            pygame.draw.rect(screen, (150, 150, 150), return_button_rect)
             return_surface = font.render("Return to Home", True, (255, 255, 255))
             return_rect = return_surface.get_rect(center=return_button_rect.center)
             screen.blit(return_surface, return_rect)
@@ -86,7 +100,6 @@ def runSettings(screen, WIDTH, HEIGHT):
 
             pygame.display.flip()
             clock.tick(FPS)
-
 
     return "home"
 
