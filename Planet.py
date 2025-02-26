@@ -18,9 +18,21 @@ class Planet:
         self.color = GlobalSettings.player_colors[player_num]
         
     def draw(self, screen, planets):
+        #Drawing the planet itself
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius, width=6)
         for connection in self.connections:
-            pygame.draw.line(screen, GlobalSettings.neutral_color, (self.x, self.y), (planets[connection].x, planets[connection].y), 4)
+            #Calculating start points on edge of circle
+            connecting_planet = planets[connection]
+            dx = self.x - connecting_planet.x
+            dy = self.y - connecting_planet.y
+            d = math.sqrt((self.x - connecting_planet.x) ** 2 + (self.y - connecting_planet.y) ** 2)
+            x_1 = self.x - self.radius * (dx / d)
+            y_1 = self.y - self.radius * (dy / d)
+            x_2 = connecting_planet.x + connecting_planet.radius * (dx / d)
+            y_2 = connecting_planet.y + connecting_planet.radius * (dy / d)
+            
+            #Drawing the line
+            pygame.draw.line(screen, GlobalSettings.neutral_color, (x_1, y_1), (x_2, y_2), 4)
             
     def add_connection(self, id):
         self.connections.append(id)
@@ -106,3 +118,4 @@ def planet_BFS(start, goal, planets):
                 
     return False
         
+    
