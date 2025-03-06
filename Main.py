@@ -211,8 +211,8 @@ def runGame():
                     if clicked_planet != None and clicked_planet.player_num == GlobalSettings.curr_player:
                         x_offset = random.randint(-clicked_planet.radius + 15, clicked_planet.radius - 15)
                         y_offset = random.randint(-clicked_planet.radius + 15, clicked_planet.radius - 15)
-                        x = mouse_x + x_offset
-                        y = mouse_y + y_offset
+                        x = clicked_planet.x + x_offset
+                        y = clicked_planet.y + y_offset
                         ships.append(Ship(x, y, clicked_planet.id, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-50)
                         
