@@ -237,12 +237,15 @@ def runGame():
         for ship in ships:
             target_planet = planets[ship.curr_planet]
             distance = math.hypot(ship.x - target_planet.x, ship.y - target_planet.y)
-            if distance < target_planet.radius and target_planet.point_value > 0 and target_planet.player_num != ship.player:
-                if ship.player == GlobalSettings.curr_player:
-                    scoreboard.update_player_sps(target_planet.point_value)
+            if distance < target_planet.radius and target_planet.player_num != ship.player:
+                if target_planet.health >= 0:
+                    target_planet.change_health(-1)
                 else:
-                    scoreboard.update_opponent_sps(target_planet.point_value)
-                target_planet.change_player(ship.player)
+                    if ship.player == GlobalSettings.curr_player:
+                        scoreboard.update_player_sps(target_planet.point_value)
+                    else:
+                        scoreboard.update_opponent_sps(target_planet.point_value)
+                    target_planet.change_player(ship.player)
             
         scoreboard.draw(screen)
         

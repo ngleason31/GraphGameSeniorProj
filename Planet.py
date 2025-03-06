@@ -13,12 +13,15 @@ class Planet:
         self.player_num = player
         self.connections = []
         self.point_value = radius // 10
-        self.planet_max_health = radius * 10
-        self.planet_health = radius * 10
+        self.max_health = radius * 10
+        self.health = radius * 10
         
     def change_player(self, player_num):
         self.player_num = player_num
         self.color = GlobalSettings.player_colors[player_num]
+        
+    def change_health(self, health):
+        self.health += health
         
     def draw(self, screen, planets):
         #Drawing the planet itself
@@ -30,11 +33,11 @@ class Planet:
         screen.blit(text, text_rect)
         
         #Drawing the healthbar for the planet
-        if self.planet_health != self.planet_max_health:
+        if self.health != self.max_health:
             x = self.x - 15
             y = self.y - 5 + 30
             pygame.draw.rect(screen, GlobalSettings.neutral_color, (x, y, 30, 10))
-            pygame.draw.rect(screen, GlobalSettings.green, (x, y, (self.planet_health / self.planet_max_health) * 30, 10))
+            pygame.draw.rect(screen, GlobalSettings.green, (x, y, (self.health / self.max_health) * 30, 10))
         for connection in self.connections:
             #Calculating start points on edge of circle
             connecting_planet = planets[connection]
