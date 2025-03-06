@@ -23,12 +23,10 @@ class Ship:
         
     def set_target(self, planet):
         self.curr_planet = planet.id
-        # x_offset = random.randint(planet.radius, planet.radius + 5)
-        # y_offset = random.randint(planet.radius, planet.radius + 5)
-        # x = planet.x + x_offset
-        # y = planet.y + y_offset
-        x = planet.x
-        y = planet.y
+        x_offset = random.randint(-planet.radius + 15, planet.radius - 15)
+        y_offset = random.randint(-planet.radius + 15, planet.radius - 15)
+        x = planet.x + x_offset
+        y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)
     
     def update_position(self):
