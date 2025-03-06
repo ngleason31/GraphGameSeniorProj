@@ -176,6 +176,12 @@ def runGame():
     planets = planet_generator()
     ships = []
     scoreboard = Scoreboard()
+    scoreboard.update_player_sps(planets[0].point_value)
+    scoreboard.update_opponent_sps(planets[1].point_value)
+    
+    # Set a timer to trigger every second (1000 milliseconds)
+    SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
+    pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
     running = True
     while running:
@@ -193,19 +199,6 @@ def runGame():
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    for ship in ships:
-                        for p in planets:
-                            distance = math.sqrt((ship.x - p.x) ** 2 + (ship.y - p.y) ** 2)
-                            # Check if the ship is close enough to capture the planet and if the planet has a nonzero point value.
-                            if distance < p.radius and p.point_value > 0 and p.player_num != ship.player:
-                                # Capture: update the score according to the ship's owner.
-                                if ship.player == GlobalSettings.curr_player:
-                                    scoreboard.update_player(p.point_value)
-                                else:
-                                    scoreboard.update_opponent(p.point_value)
-                                # Change planet ownership and set its point value to 0 so that it can't be captured repeatedly.
-                                p.change_player(ship.player)
-                                p.point_value = 0
                     # Movement Logic: Use the clicked planet to set the ship's target.
                     if clicked_planet is not None:
                         for ship in ships:
@@ -224,6 +217,10 @@ def runGame():
                         y = clicked_planet.y
                         ships.append(Ship(x, y, clicked_planet.id, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-50)
+                        
+            # Handle scoreboard update event every second
+            elif event.type == SCORE_UPDATE_EVENT:
+                scoreboard.update()
                 
         #Use global background setting for the game.
         if GlobalSettings.dark_background:
@@ -244,11 +241,10 @@ def runGame():
             distance = math.hypot(ship.x - target_planet.x, ship.y - target_planet.y)
             if distance < target_planet.radius and target_planet.point_value > 0 and target_planet.player_num != ship.player:
                 if ship.player == GlobalSettings.curr_player:
-                    scoreboard.update_player(target_planet.point_value)
+                    scoreboard.update_player_sps(target_planet.point_value)
                 else:
-                    scoreboard.update_opponent(target_planet.point_value)
+                    scoreboard.update_opponent_sps(target_planet.point_value)
                 target_planet.change_player(ship.player)
-                target_planet.point_value = 0
             
         scoreboard.draw(screen)
         

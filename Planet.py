@@ -13,7 +13,7 @@ class Planet:
         self.player_num = player
         self.connections = []
         # Assign a random point value between 0 and 75 to the planet.
-        self.point_value = random.randint(1, 75)
+        self.point_value = radius // 10
         
     def change_player(self, player_num):
         self.player_num = player_num
