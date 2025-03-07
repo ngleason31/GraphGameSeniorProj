@@ -240,12 +240,19 @@ def runGame():
             if distance < target_planet.radius and target_planet.player_num != ship.player:
                 if target_planet.health >= 0:
                     target_planet.change_health(-1)
+                    target_planet.ship_attacking = True
                 else:
                     if ship.player == GlobalSettings.curr_player:
                         scoreboard.update_player_sps(target_planet.point_value)
                     else:
                         scoreboard.update_opponent_sps(target_planet.point_value)
                     target_planet.change_player(ship.player)
+                    target_planet.ship_attacking = False
+            
+        #Planets healing        
+        for planet in planets:
+            if not planet.ship_attacking and planet.health < planet.max_health:
+                planet.change_health(1)
             
         scoreboard.draw(screen)
         

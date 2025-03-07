@@ -9,6 +9,7 @@ class Planet:
         self.x = x
         self.y = y
         self.radius = radius
+        self.ship_attacking = False
         self.color = GlobalSettings.player_colors[player]
         self.player_num = player
         self.connections = []
