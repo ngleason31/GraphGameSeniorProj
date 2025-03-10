@@ -4,6 +4,7 @@ import sys
 from Planet import planet_generator, planet_loc
 from Scoreboard import Scoreboard
 from Ship import Ship
+from Shop import Shop
 from pygame.locals import *
 import StartScreen
 import Credits
@@ -178,6 +179,7 @@ def runGame():
     scoreboard = Scoreboard()
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
+    shop = Shop()
     
     # Set a timer to trigger every second (1000 milliseconds)
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
@@ -185,6 +187,9 @@ def runGame():
 
     running = True
     while running:
+        
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_x, mouse_y = mouse_pos
         
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -196,9 +201,17 @@ def runGame():
                     if result == "home":
                         return "home"
             elif event.type == MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 50:
+                        #Buys a ship at original planet
+                        x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
+                        y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
+                        x = planets[0].x + x_offset
+                        y = planets[0].y + y_offset
+                        ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
+                        scoreboard.update_player(-50)
+                if event.button == 3:
                     # Movement Logic: Use the clicked planet to set the ship's target.
                     if clicked_planet is not None:
                         for ship in ships:
@@ -206,19 +219,14 @@ def runGame():
                             # Check if the clicked planet is connected to the ship's current planet.
                             if clicked_planet.id in current_planet.connections:
                                 ship.set_target(clicked_planet)
-                                break                 
-                if event.button == 3 and scoreboard.player_score >= 50:
-                    if clicked_planet != None and clicked_planet.player_num == GlobalSettings.curr_player:
-                        x_offset = random.randint(-clicked_planet.radius + 15, clicked_planet.radius - 15)
-                        y_offset = random.randint(-clicked_planet.radius + 15, clicked_planet.radius - 15)
-                        x = clicked_planet.x + x_offset
-                        y = clicked_planet.y + y_offset
-                        ships.append(Ship(x, y, clicked_planet.id, player=GlobalSettings.curr_player))
-                        scoreboard.update_player(-50)
+                                break
                         
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
+                
+        #Changes color of shop if hovered over
+        shop.is_hovered(mouse_pos)
                 
         #Use global background setting for the game.
         if GlobalSettings.dark_background:
@@ -255,6 +263,7 @@ def runGame():
                 planet.change_health(1)
             
         scoreboard.draw(screen)
+        shop.draw(screen)
         
         pygame.display.update()
         FramePerSec.tick(FPS)

@@ -13,6 +13,7 @@ class Ship:
         self.speed = speed
         self.curr_target = self.pos
         self.curr_planet = curr_planet
+        self.is_selected = False
         
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
