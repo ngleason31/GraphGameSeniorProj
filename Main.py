@@ -182,6 +182,11 @@ def runGame():
     scoreboard.update_opponent_sps(planets[1].point_value)
     shop = Shop()
     
+    #init for dragging selection
+    dragging = False
+    dragging_start_pos = (0, 0)
+    dragging_current_pos = (0, 0)
+    
     # Set a timer to trigger every second (1000 milliseconds)
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
@@ -217,7 +222,7 @@ def runGame():
                         scoreboard.update_player(-50)
                     
                     #Selects a single ship in the hitbox randomly (unless shift is being pressed)
-                    if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT] and not shop.is_clicked(mouse_pos):
+                    if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
                         for ship in selected_ships:
                             ship.is_selected = False
                         selected_ships = []
@@ -230,7 +235,7 @@ def runGame():
                     #sets up dragging selection 
                     if not shop.is_clicked(mouse_pos):
                         dragging = True
-                        start_pos = event.pos
+                        dragging_start_pos = event.pos
                 if event.button == 3:
                     # Movement Logic: Use the clicked planet to set the ship's target.
                     if clicked_planet is not None:
@@ -243,6 +248,20 @@ def runGame():
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
+            #Ends dragging if 
+            elif event.type == MOUSEBUTTONUP:
+                if event.button == 1:
+                    if dragging:
+                        #Check if any ships are included
+                        x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
+                        width = abs(dragging_current_pos[0] - dragging_start_pos[0])
+                        height = abs(dragging_current_pos[1] - dragging_start_pos[1])
+                        for ship in ships:
+                            if x <= ship.x <= x + width and y <= ship.y <= y + height:
+                                selected_ships.append(ship)
+                                ship.is_selected = True
+                                
+                        dragging = False
                 
         #Changes color of shop if hovered over
         shop.is_hovered(mouse_pos)
@@ -283,6 +302,21 @@ def runGame():
             
         scoreboard.draw(screen)
         shop.draw(screen)
+        
+        #Draws and selects the rectangle for selcting ships
+        if dragging:
+            dragging_current_pos = pygame.mouse.get_pos()
+            
+            x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
+            width = abs(dragging_current_pos[0] - dragging_start_pos[0])
+            height = abs(dragging_current_pos[1] - dragging_start_pos[1])
+
+            overlay = pygame.Surface((width, height), pygame.SRCALPHA)
+            overlay.fill((GlobalSettings.neutral_color[0], GlobalSettings.neutral_color[1], GlobalSettings.neutral_color[2], 100))
+
+            screen.blit(overlay, (x, y))
+
+            
         
         pygame.display.update()
         FramePerSec.tick(FPS)
