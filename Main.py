@@ -176,6 +176,7 @@ def winnerScreen(winner, screen, WIDTH, HEIGHT):
 def runGame():
     planets = planet_generator()
     ships = []
+    selected_ships = []
     scoreboard = Scoreboard()
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
@@ -187,6 +188,9 @@ def runGame():
 
     running = True
     while running:
+        
+        #Gets the currently held down keys
+        keys = pygame.key.get_pressed()
         
         mouse_pos = pygame.mouse.get_pos()
         mouse_x, mouse_y = mouse_pos
@@ -211,15 +215,30 @@ def runGame():
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-50)
+                    
+                    #Selects a single ship in the hitbox randomly (unless shift is being pressed)
+                    if not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT] and not shop.is_clicked(mouse_pos):
+                        for ship in selected_ships:
+                            ship.is_selected = False
+                        selected_ships = []
+                        
+                    for ship in ships:
+                        if ship.is_clicked(mouse_pos):
+                            ship.is_selected = True
+                            selected_ships.append(ship)
+                    
+                    #sets up dragging selection 
+                    if not shop.is_clicked(mouse_pos):
+                        dragging = True
+                        start_pos = event.pos
                 if event.button == 3:
                     # Movement Logic: Use the clicked planet to set the ship's target.
                     if clicked_planet is not None:
-                        for ship in ships:
+                        for ship in selected_ships:
                             current_planet = planets[ship.curr_planet]
                             # Check if the clicked planet is connected to the ship's current planet.
                             if clicked_planet.id in current_planet.connections:
                                 ship.set_target(clicked_planet)
-                                break
                         
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:

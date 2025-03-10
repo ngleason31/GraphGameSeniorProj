@@ -17,6 +17,8 @@ class Ship:
         
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
+        if self.is_selected:
+            pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=8)
         pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=6)
     
     def get_position(self):
@@ -42,3 +44,9 @@ class Ship:
         
         self.x = self.pos[0]
         self.y = self.pos[1]
+        
+    def is_clicked(self, pos):
+        if pos[0] <= self.x + self.size and pos[0] >= self.x - self.size and pos[1] >= self.y - self.size and pos[1] <= self.y + self.size:
+            return True
+        else:
+            return False
