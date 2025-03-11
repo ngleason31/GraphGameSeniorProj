@@ -299,6 +299,13 @@ def runGame():
         for planet in planets:
             if not planet.ship_attacking and planet.health < planet.max_health:
                 planet.change_health(1)
+            has_ship_attacking = False
+            for ship in ships:
+                if ship.curr_planet == planet.id:
+                    has_ship_attacking == True
+            
+            if not has_ship_attacking:
+                planet.ship_attacking = False
             
         scoreboard.draw(screen)
         shop.draw(screen)
