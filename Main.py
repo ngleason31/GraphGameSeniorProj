@@ -16,6 +16,9 @@ import math
 pygame.init()
 pygame.mixer.init()
 
+CPU_TURN_EVENT = pygame.USEREVENT + 2 # Custom event for CPU turn
+pygame.time.set_timer(CPU_TURN_EVENT, 1000)  # Fire the CPU logic every second
+
 # Load and play the background music
 pygame.mixer.music.load("Audio/gameMusic.mp3")
 pygame.mixer.music.play(-1)
@@ -33,6 +36,48 @@ FramePerSec = pygame.time.Clock()
 screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
+
+def bfs_next_step(start_planet_id, goal_planet_id, planets):
+    """
+    Returns the planet ID of the *next step* on the shortest path from start_planet_id 
+    to goal_planet_id, traversing any hyperlane (ignoring ownership).
+    If no path is found or if start == goal, returns None.
+    """
+    if start_planet_id == goal_planet_id:
+        return None
+
+    parent = {p.id: -1 for p in planets}
+    visited = set([start_planet_id])
+    queue = [start_planet_id]
+
+    while queue:
+        curr = queue.pop(0)
+        if curr == goal_planet_id:
+            break
+
+        # Explore all neighbors in the hyperlane graph
+        for neighbor_id in planets[curr].connections:
+            if neighbor_id not in visited:
+                visited.add(neighbor_id)
+                parent[neighbor_id] = curr
+                queue.append(neighbor_id)
+    else:
+        # BFS never reached goal_planet_id
+        return None
+
+    # Reconstruct path by going backwards from goal to start
+    path = []
+    node = goal_planet_id
+    while node != -1:
+        path.append(node)
+        node = parent[node]
+    path.reverse() # path is now from start to goal
+
+    # If there's at least one step to take, path will have length >= 2
+    if len(path) > 1:
+        return path[1]  # the immediate next planet to move toward
+    return None
+
 
 def pauseMenu(screen, WIDTH, HEIGHT):
     pause_font = pygame.font.Font(None, 72)
@@ -191,6 +236,9 @@ def runGame():
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
+    CPU_TURN_EVENT = pygame.USEREVENT + 2
+    pygame.time.set_timer(CPU_TURN_EVENT, 1000) # CPU logic every second
+
     running = True
     while running:
         
@@ -248,7 +296,51 @@ def runGame():
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
-            #Ends dragging if 
+
+            # Handle CPU turn event every second
+            elif event.type == CPU_TURN_EVENT:
+                # 1) Auto-spawn CPU ships if enough score
+                if scoreboard.opponent_score >= 50:
+                    cpu_home = planets[1]  # or whichever planet is the CPU's "base"
+                    x_offset = random.randint(-cpu_home.radius + 15, cpu_home.radius - 15)
+                    y_offset = random.randint(-cpu_home.radius + 15, cpu_home.radius - 15)
+                    ships.append(Ship(cpu_home.x + x_offset, cpu_home.y + y_offset,
+                                    cpu_home.id, player=GlobalSettings.opposing_player))
+                    scoreboard.update_opponent(-50)
+
+                #For each CPU ship, pick the best planet to capture and move one step along BFS
+                for ship in ships:
+                    if ship.player != GlobalSettings.opposing_player:
+                        continue  # only manage CPU ships
+
+                    current_planet = planets[ship.curr_planet]
+
+                    #If physically on a planet that isn't owned yet, skip movement (still capturing).
+                    distance = math.hypot(ship.x - current_planet.x, ship.y - current_planet.y)
+                    if distance < current_planet.radius and current_planet.player_num != GlobalSettings.opposing_player:
+                        continue
+
+                    #Among all non-CPU planets, find which is reachable and has the highest point_value
+                    best_planet = None
+                    best_value = -1
+                    best_next_step_id = None
+
+                    non_cpu_planets = [p for p in planets if p.player_num != GlobalSettings.opposing_player]
+
+                    for candidate_planet in non_cpu_planets:
+                        next_step_id = bfs_next_step(current_planet.id, candidate_planet.id, planets)
+                        if next_step_id is not None:
+                            # BFS found a path => see if it's "better"
+                            if candidate_planet.point_value > best_value:
+                                best_value = candidate_planet.point_value
+                                best_planet = candidate_planet
+                                best_next_step_id = next_step_id
+
+                    #If we found a reachable planet, move one hop toward it
+                    if best_planet and best_next_step_id is not None:
+                        # next_step_id is the planet ID of the next immediate planet in the BFS path
+                        ship.set_target(planets[best_next_step_id])
+
             elif event.type == MOUSEBUTTONUP:
                 if event.button == 1:
                     if dragging:
@@ -279,21 +371,103 @@ def runGame():
             ship.update_position()
             ship.draw(screen)
 
+        #Group ships by planet
+        planet_ship_map = {}
+        for s in ships:
+            # Which planet is this ship headed to?
+            p = planets[s.curr_planet]
+            # Check if ship has actually arrived inside p's radius
+            distance = math.hypot(s.x - p.x, s.y - p.y)
+            if distance < p.radius and s.landed:
+                # Only then do we consider it "on" this planet
+                planet_ship_map.setdefault(s.curr_planet, []).append(s)
+
+        #Conflict logic
+        for planet_id, ship_list in planet_ship_map.items():
+            # how many different owners?
+            owners = set(s.player for s in ship_list)
+            if len(owners) > 1:
+                # conflict => set planet.ship_attacking = True, apply damage multipliers, etc.
+                conflict_planet = planets[planet_id]
+                conflict_planet.ship_attacking = True
+            if len(owners) < 2:
+                continue  # no conflict if only one (or zero) owners
+
+            # There's a conflict => pause capturing on this planet
+            conflict_planet = planets[planet_id]
+            conflict_planet.ship_attacking = True
+
+            # Separate the ships by player
+            user_ships = [s for s in ship_list if s.player == GlobalSettings.curr_player]
+            cpu_ships = [s for s in ship_list if s.player == GlobalSettings.opposing_player]
+
+            # If both sides exist, apply damage
+            if len(user_ships) > 0 and len(cpu_ships) > 0:
+                # Calculate difference
+                # E.g. if 3 CPU ships vs 2 user ships => difference=1 => user ships take 1.1x damage
+                u_count = len(user_ships)
+                c_count = len(cpu_ships)
+                difference = abs(u_count - c_count)
+
+                # Base damage can be 1.0 each frame, or smaller if you want slower fights
+                base_damage = 0.2
+
+                # Decide who is outnumbered
+                # If the CPU has more ships, user is outnumbered => user gets multiplier
+                # If the user has more ships, CPU is outnumbered => CPU gets multiplier
+                # If equal, both do base damage
+                if difference > 0:
+                    multiplier = 1.0 + 0.1 * difference
+                    if c_count > u_count:
+                        # user is outnumbered => user ships get extra damage
+                        for ship in user_ships:
+                            ship.health -= base_damage * multiplier
+                        # CPU ships just get base damage
+                        for ship in cpu_ships:
+                            ship.health -= base_damage
+                    elif u_count > c_count:
+                        # CPU is outnumbered => CPU ships get extra damage
+                        for ship in cpu_ships:
+                            ship.health -= base_damage * multiplier
+                        # user ships get base damage
+                        for ship in user_ships:
+                            ship.health -= base_damage
+                else:
+                    # difference == 0 => same # ships on each side => apply base damage to all
+                    for ship in user_ships:
+                        ship.health -= base_damage
+                    for ship in cpu_ships:
+                        ship.health -= base_damage
+
+            #Remove destroyed ships (health <= 0)
+            for s in ship_list[:]: 
+                if s.health <= 0:
+                    ship_list.remove(s)
+                    ships.remove(s)
+
+
         # Capture Logic: Check if any ship has reached its target planet.
         for ship in ships:
             target_planet = planets[ship.curr_planet]
             distance = math.hypot(ship.x - target_planet.x, ship.y - target_planet.y)
-            if distance < target_planet.radius and target_planet.player_num != ship.player:
-                if target_planet.health >= 0:
-                    target_planet.change_health(-1)
-                    target_planet.ship_attacking = True
-                else:
-                    if ship.player == GlobalSettings.curr_player:
-                        scoreboard.update_player_sps(target_planet.point_value)
+
+            # "Conflict check": if ship_attacking is True, skip capturing
+            if distance < target_planet.radius:
+                # Are we in conflict? If so, skip capturing
+                in_conflict = target_planet.ship_attacking
+                if not in_conflict and target_planet.player_num != ship.player:
+                    # normal capture logic
+                    if target_planet.health >= 0:
+                        target_planet.change_health(-1)
+                        target_planet.ship_attacking = True
                     else:
-                        scoreboard.update_opponent_sps(target_planet.point_value)
-                    target_planet.change_player(ship.player)
-                    target_planet.ship_attacking = False
+                        # Planet changes ownership
+                        if ship.player == GlobalSettings.curr_player:
+                            scoreboard.update_player_sps(target_planet.point_value)
+                        else:
+                            scoreboard.update_opponent_sps(target_planet.point_value)
+                        target_planet.change_player(ship.player)
+                        target_planet.ship_attacking = False
             
         #Planets healing        
         for planet in planets:
