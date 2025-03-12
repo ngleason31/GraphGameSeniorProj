@@ -276,7 +276,7 @@ def runGame():
                         selected_ships = []
                         
                     for ship in ships:
-                        if ship.is_clicked(mouse_pos):
+                        if ship.is_clicked(mouse_pos) and ship.player == GlobalSettings.curr_player:
                             ship.is_selected = True
                             selected_ships.append(ship)
                     
@@ -349,7 +349,7 @@ def runGame():
                         width = abs(dragging_current_pos[0] - dragging_start_pos[0])
                         height = abs(dragging_current_pos[1] - dragging_start_pos[1])
                         for ship in ships:
-                            if x <= ship.x <= x + width and y <= ship.y <= y + height:
+                            if x <= ship.x <= x + width and y <= ship.y <= y + height and ship.player == GlobalSettings.curr_player:
                                 selected_ships.append(ship)
                                 ship.is_selected = True
                                 

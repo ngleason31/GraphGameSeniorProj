@@ -35,10 +35,8 @@ class Planet:
         
         #Drawing the healthbar for the planet
         if self.health != self.max_health:
-            x = self.x - 15
-            y = self.y - 5 + 30
-            pygame.draw.rect(screen, GlobalSettings.neutral_color, (x, y, 30, 10))
-            pygame.draw.rect(screen, GlobalSettings.green, (x, y, (self.health / self.max_health) * 30, 10))
+            self.draw_health_bar(screen)
+            
         for connection in self.connections:
             #Calculating start points on edge of circle
             connecting_planet = planets[connection]
@@ -55,6 +53,22 @@ class Planet:
             
     def add_connection(self, id):
         self.connections.append(id)
+        
+    def draw_health_bar(self, screen):
+        #Draws a small health bar above the ship.
+        bar_width = 50
+        bar_height = 10
+        offset_y = -15  
+
+        # position the bar above the ship
+        bar_x = self.x - bar_width // 2
+        bar_y = self.y - offset_y
+
+        # outline
+        pygame.draw.rect(screen, GlobalSettings.neutral_color, (bar_x, bar_y, bar_width, bar_height), 1)
+        # fill
+        fill_width = (self.health / self.max_health) * (bar_width - 2)
+        pygame.draw.rect(screen, GlobalSettings.red, (bar_x+1, bar_y+1, fill_width, bar_height-2))
         
 def planet_generator():
     #Start with a top left, center, and bottom left planet

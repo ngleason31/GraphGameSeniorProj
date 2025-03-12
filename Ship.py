@@ -26,7 +26,8 @@ class Ship:
             pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=8)
         pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=6)
 
-        self.draw_health_bar(screen)
+        if self.health != self.max_health:
+            self.draw_health_bar(screen)
 
     def draw_health_bar(self, screen):
         #Draws a small health bar above the ship.
@@ -42,7 +43,7 @@ class Ship:
         pygame.draw.rect(screen, GlobalSettings.neutral_color, (bar_x, bar_y, bar_width, bar_height), 1)
         # fill
         fill_width = (self.health / self.max_health) * (bar_width - 2)
-        pygame.draw.rect(screen, (255,0,0), (bar_x+1, bar_y+1, fill_width, bar_height-2))
+        pygame.draw.rect(screen, GlobalSettings.red, (bar_x+1, bar_y+1, fill_width, bar_height-2))
 
     
     def get_position(self):
