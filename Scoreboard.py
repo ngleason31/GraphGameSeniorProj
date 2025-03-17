@@ -3,9 +3,9 @@ import GlobalSettings
 
 class Scoreboard:
     def __init__(self):
-        self.player_score = 0
+        self.player_score = 50
         self.player_sps = 0
-        self.opponent_sps = 0
+        self.opponent_sps = 50
         self.opponent_score = 0
         self.font = pygame.font.Font(None, 36)
         

@@ -4,7 +4,7 @@ import random
 
 
 class Ship:
-    def __init__(self, x, y, curr_planet, player=0, size=10, speed=5):
+    def __init__(self, x, y, curr_planet, player=0, size=5, speed=5):
         self.x = x
         self.y = y
         self.pos = pygame.Vector2(x, y)
@@ -23,8 +23,8 @@ class Ship:
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
         if self.is_selected:
-            pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=8)
-        pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=6)
+            pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=5)
+        pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=3)
 
         if self.health != self.max_health:
             self.draw_health_bar(screen)
@@ -51,8 +51,8 @@ class Ship:
         
     def set_target(self, planet):
         self.next_planet = planet.id
-        x_offset = random.randint(-planet.radius + 15, planet.radius - 15)
-        y_offset = random.randint(-planet.radius + 15, planet.radius - 15)
+        x_offset = random.randint(-planet.radius + 2, planet.radius - 2)
+        y_offset = random.randint(-planet.radius + 2, planet.radius - 2)
         x = planet.x + x_offset
         y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)
