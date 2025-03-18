@@ -4,12 +4,8 @@ import sys
 import GlobalSettings
 from pygame.locals import *
 
-
 pygame.init()   
  
-#Screen Dimensions
-pygame.display.set_caption("Welcome Screen")
-
 #Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -45,6 +41,7 @@ def draw_button(surface, text, rect, inactive_color, active_color):
 
 
 def welcomeScreen(screen, screenWidth, screenHeight):
+
     clock = pygame.time.Clock()
     running = True
 
