@@ -31,7 +31,7 @@ def runGame(screen):
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
     CPU_TURN_EVENT = pygame.USEREVENT + 2
-    pygame.time.set_timer(CPU_TURN_EVENT, 1000) # CPU logic every second
+    pygame.time.set_timer(CPU_TURN_EVENT, 3000) # CPU logic every 3 seconds (slower to make sure user can compete)
 
     running = True
     while running:
@@ -87,7 +87,7 @@ def runGame(screen):
                             if clicked_planet.id in current_planet.connections:
                                 ship.set_target(clicked_planet)
                                 
-            # Handle CPU turn event every second
+            # Handle CPU turn event every 3 seconds
             elif event.type == CPU_TURN_EVENT:
                 # 1) Auto-spawn CPU ships if enough score
                 if scoreboard.opponent_score >= 50:
