@@ -90,7 +90,7 @@ def runGame(screen):
             # Handle CPU turn event every 3 seconds
             elif event.type == CPU_TURN_EVENT:
                 # 1) Auto-spawn CPU ships if enough score
-                if scoreboard.opponent_score >= 50:
+                while scoreboard.opponent_score >= 50:
                     cpu_home = planets[1]  # or whichever planet is the CPU's "base"
                     x_offset = random.randint(-cpu_home.radius + 15, cpu_home.radius - 15)
                     y_offset = random.randint(-cpu_home.radius + 15, cpu_home.radius - 15)
