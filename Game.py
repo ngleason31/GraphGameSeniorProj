@@ -384,45 +384,6 @@ def pauseMenu(screen, WIDTH, HEIGHT):
     
     return "resume"
 
-def how_to_play_menu(screen, WIDTH, HEIGHT):
-    instructions = [
-        "How to Play:",
-        "1. Left-click to move your ship.",
-        "2. Right-click (if score >= 50) to spawn a new ship.",
-        "3. Press ESC to pause the game.",
-        "",
-        "Press any key or click to start!"
-    ]
-    
-    clock = pygame.time.Clock()
-    waiting = True
-    font = pygame.font.Font(None, 36)
-    
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
-                waiting = False
-        
-        # Use global background color based on settings
-        bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
-        screen.fill(bg_color)
-        
-        # Draw each line of instructions centered on screen
-        y_offset = HEIGHT // 4
-        for line in instructions:
-            text_surface = font.render(line, True, GlobalSettings.neutral_color)
-            text_rect = text_surface.get_rect(center=(WIDTH // 2, y_offset))
-            screen.blit(text_surface, text_rect)
-            y_offset += 40  # Adjust spacing between lines
-        
-        pygame.display.flip()
-        clock.tick(60)
-    
-    return "start"
-
 def checkForWinner(planets):
     # Assume that a planet with player_num 0 is neutral.
     # If all planets are owned by the same non-zero player, that player wins.

@@ -5,7 +5,8 @@ import StartScreen
 import Credits
 import Settings
 import GlobalSettings
-from Game import how_to_play_menu, runGame
+from SelectionScreen import selection_screen
+from Game import runGame
 
 pygame.init()
 pygame.mixer.init()
@@ -39,19 +40,25 @@ def main():
             pygame.time.delay(10)
         # Show welcome screen and wait for the user to select an option.
         option = StartScreen.welcomeScreen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
-        print("User Selected:", option)
   
-        if option.lower() in "player 1":
+        if option.lower() == "single player":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            how_to_play_menu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='singleplayer')
             res = runGame(screen)
             if res == "quit":
                 running = False
-        elif option.lower() in "player 2":
+        elif option.lower() in "multiplayer":
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
-            how_to_play_menu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
+            res = runGame(screen)
+            if res == "quit":
+                running = False
+        elif option.lower() in "computer":
+            GlobalSettings.curr_player = 1
+            GlobalSettings.opposing_player = 2
+            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
             res = runGame(screen)
             if res == "quit":
                 running = False
