@@ -44,32 +44,35 @@ def main():
         if option.lower() == "single player":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='singleplayer')
-            res = runGame(screen)
-            if res == "quit":
-                running = False
-        elif option.lower() in "multiplayer":
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='singleplayer')
+            if res != "home":
+                res = runGame(screen)
+                if res == "quit":
+                    running = False
+        elif option.lower() in "multiplayer":   
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
-            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
-            res = runGame(screen)
-            if res == "quit":
-                running = False
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
+            if res != "home":
+                res = runGame(screen)
+                if res == "quit":
+                    running = False
         elif option.lower() in "computer":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
-            res = runGame(screen)
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
+            if res != "home":
+                res = runGame(screen)
+                if res == "quit":
+                    running = False
+        elif option.lower() == "credits":
+            res = Credits.runCredits(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             if res == "quit":
                 running = False
-        elif option.lower() == "credits":
-            ret = Credits.runCredits(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
-            if ret == "quit":
-                running = False
         elif option.lower() == "settings":
-            ret = Settings.runSettings(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            res = Settings.runSettings(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             GlobalSettings.update_audio()
-            if ret == "quit":
+            if res == "quit":
                 running = False
         elif option.lower() == "quit" or option is None:
             running = False

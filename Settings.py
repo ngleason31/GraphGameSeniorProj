@@ -4,7 +4,6 @@ import GlobalSettings
 
 def runSettings(screen, WIDTH, HEIGHT):
     # Get display dimensions
-    pygame.display.set_caption("Settings")
     clock = pygame.time.Clock()
     FPS = 60
 
