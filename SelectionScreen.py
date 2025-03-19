@@ -56,9 +56,21 @@ def selection_screen(screen, width, height, mode):
             #Draw selction sides
             pygame.draw.rect(screen, GlobalSettings.gray, player1_rect)
             pygame.draw.rect(screen, bg_color, player1_box)
+            triangle_points = [
+                (player1_box.centerx, player1_box.y + 15),
+                (player1_box.x + 15, player1_box.bottom - 15),
+                (player1_box.right - 15, player1_box.bottom - 15)
+            ]
+            pygame.draw.polygon(screen, GlobalSettings.player_colors[1], triangle_points, width=4)
             
             pygame.draw.rect(screen, GlobalSettings.gray, player2_rect)
             pygame.draw.rect(screen, bg_color, player2_box)
+            triangle_points = [
+                (player2_box.centerx, player2_box.y + 15),
+                (player2_box.x + 15, player2_box.bottom - 15),
+                (player2_box.right - 15, player2_box.bottom - 15)
+            ]
+            pygame.draw.polygon(screen, GlobalSettings.player_colors[2], triangle_points, width=4)
             
             if mode.lower() == 'single player':
                 player_surface = font.render("Player 1", True, (255, 255, 255))
