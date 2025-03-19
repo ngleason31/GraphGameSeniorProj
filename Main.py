@@ -44,7 +44,7 @@ def main():
         if option.lower() == "single player":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='singleplayer')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='single player')
             if res != "home":
                 res = runGame(screen)
                 if res == "quit":

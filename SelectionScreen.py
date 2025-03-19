@@ -12,6 +12,12 @@ def selection_screen(screen, width, height, mode):
     #Button definitions
     return_button_rect = pygame.Rect(width // 2 - 300, height - 200, 200, 50)
     continue_button_rect = pygame.Rect(width // 2 + 100, height - 200, 200, 50)
+    
+    #Selection definitions
+    player1_rect = pygame.Rect(width // 2 - 600, 200, 400, 100)
+    player1_box = pygame.Rect(width // 2 - 560, 215, 70, 70)
+    player2_rect = pygame.Rect(width // 2 + 200, 200, 400, 100)
+    player2_box = pygame.Rect(width // 2 + 490, 215, 70, 70)
 
     running = True
     while running:
@@ -46,6 +52,41 @@ def selection_screen(screen, width, height, mode):
                 pygame.draw.rect(screen, GlobalSettings.black, continue_button_rect)
             else:
                 pygame.draw.rect(screen, GlobalSettings.gray, continue_button_rect)
+                
+            #Draw selction sides
+            pygame.draw.rect(screen, GlobalSettings.gray, player1_rect)
+            pygame.draw.rect(screen, bg_color, player1_box)
+            
+            pygame.draw.rect(screen, GlobalSettings.gray, player2_rect)
+            pygame.draw.rect(screen, bg_color, player2_box)
+            
+            if mode.lower() == 'single player':
+                player_surface = font.render("Player 1", True, (255, 255, 255))
+                player_rect = player_surface.get_rect(center=player1_rect.center)
+                screen.blit(player_surface, player_rect)
+                
+                computer_surface = font.render("Computer", True, (255, 255, 255))
+                computer_rect = computer_surface.get_rect(center=player2_rect.center)
+                screen.blit(computer_surface, computer_rect)
+                
+            if mode.lower() == 'multiplayer':
+                player1_text_surface = font.render("Player 1", True, (255, 255, 255))
+                player1_text_rect = player1_text_surface.get_rect(center=player1_rect.center)
+                screen.blit(player1_text_surface, player1_text_rect)
+                
+                player2_text_surface = font.render("Player 2", True, (255, 255, 255))
+                player2_text_rect = player1_text_surface.get_rect(center=player2_rect.center)
+                screen.blit(player2_text_surface, player2_text_rect)
+                
+            if mode.lower() == 'computer':
+                computer1_surface = font.render("Computer", True, (255, 255, 255))
+                computer1_rect = computer1_surface.get_rect(center=player1_rect.center)
+                screen.blit(computer1_surface, computer1_rect)
+                
+                computer2_surface = font.render("Computer", True, (255, 255, 255))
+                computer2_rect = computer2_surface.get_rect(center=player2_rect.center)
+                screen.blit(computer2_surface, computer2_rect)
+                
                 
             # Draw Return to Home button
             return_surface = font.render("Return to Home", True, (255, 255, 255))
