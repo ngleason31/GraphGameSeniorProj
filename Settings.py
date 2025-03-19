@@ -102,10 +102,3 @@ def runSettings(screen, WIDTH, HEIGHT):
             clock.tick(FPS)
 
     return "home"
-
-# For standalone testing:
-if __name__ == "__main__":
-    result = runSettings()
-    if result == "quit":
-        pygame.quit()
-        sys.exit()
