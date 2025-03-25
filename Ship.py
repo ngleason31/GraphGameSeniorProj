@@ -51,8 +51,8 @@ class Ship:
         
     def set_target(self, planet):
         self.next_planet = planet.id
-        x_offset = random.randint(-planet.radius + 2, planet.radius - 2)
-        y_offset = random.randint(-planet.radius + 2, planet.radius - 2)
+        x_offset = random.randint(-planet.radius + 15, planet.radius - 15)
+        y_offset = random.randint(-planet.radius + 15, planet.radius - 15)
         x = planet.x + x_offset
         y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)

@@ -87,7 +87,7 @@ def planet_generator():
             y = random.randint(150, GlobalSettings.HEIGHT - 150)
             for planet in planets:
                 planet_distance = math.sqrt((planet.x - x) ** 2 + (planet.y - y) ** 2)
-                if planet_distance <= 115:
+                if planet_distance <= 110:
                     planet_found = True
                 if planet_distance <= 80:
                     planet_found = False
