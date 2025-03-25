@@ -76,7 +76,7 @@ def planet_generator():
     opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 30, GlobalSettings.opposing_player)
     
     planets = [player_planet, opposing_planet]
-    num_planets = random.randint(80, 100) + 2
+    num_planets = random.randint(80, 90) + 2
     
     #Generates planets that are at least close to another planet, but far enough from all planets not to overlap
     for id in range(num_planets - 2):

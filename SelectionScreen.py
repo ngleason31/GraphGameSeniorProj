@@ -81,7 +81,13 @@ def selection_screen(screen, width, height, mode):
                         return ['home', None, None]
                 
                 if continue_button_rect.collidepoint(mouse):
-                        return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
+                        if mode.lower() == 'single player':
+                            return ['game', None, dropdown_menu2.options[dropdown_menu2.selected_index]]
+                        if mode.lower() == 'computer':
+                            return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
+                        else:
+                            return ['game', None, None]
+                                    
                     
             # Use the global background setting for the color.
             if GlobalSettings.dark_background:

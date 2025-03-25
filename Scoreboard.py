@@ -19,6 +19,9 @@ class Scoreboard:
     def update_opponent(self, change):
         self.opponent_score += change
         
+    def get_scores(self):
+        return [self.player_score, self.opponent_score]
+        
     def update_player_sps(self, sps):
         self.player_sps += sps
         

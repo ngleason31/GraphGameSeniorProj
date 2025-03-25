@@ -46,7 +46,7 @@ def main():
             GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='single player')
             if res[0] != "home":
-                res = runGame(screen)
+                res = runGame(screen, res[1], res[2])
                 if res == "quit":
                     running = False
         elif option.lower() in "multiplayer":   
@@ -54,7 +54,7 @@ def main():
             GlobalSettings.opposing_player = 1
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
             if res[0] != "home":
-                res = runGame(screen)
+                res = runGame(screen, res[1], res[2])
                 if res == "quit":
                     running = False
         elif option.lower() in "computer":
@@ -62,7 +62,7 @@ def main():
             GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
             if res[0] != "home":
-                res = runGame(screen)
+                res = runGame(screen, res[1], res[2])
                 if res == "quit":
                     running = False
         elif option.lower() == "credits":
