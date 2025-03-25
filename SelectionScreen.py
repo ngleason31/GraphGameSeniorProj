@@ -64,22 +64,24 @@ def selection_screen(screen, width, height, mode):
     player2_rect = pygame.Rect(width // 2 + 200, 200, 400, 100)
     player2_box = pygame.Rect(width // 2 + 490, 215, 70, 70)
     
-    dropdown_menu = Dropdown(width // 2 + 200, 350, 400, 50, ['Best Move First', 'Worst Move First', 'DFS', 'BFS'], "Select a computer setting:", font)
+    dropdown_menu1 = Dropdown(width // 2 - 600, 350, 400, 50, ['Best Move First', 'Worst Move First', 'DFS', 'BFS'], "Select settings for Computer 1:", font)
+    dropdown_menu2 = Dropdown(width // 2 + 200, 350, 400, 50, ['Best Move First', 'Worst Move First', 'DFS', 'BFS'], "Select settings for Computer 2:", font)
+
 
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                    return "home"
+                    return ["home", None, None]
                 
             #Handle button presses
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
                 if return_button_rect.collidepoint(mouse):
-                        return 'home'
+                        return ['home', None, None]
                 
                 if continue_button_rect.collidepoint(mouse):
-                        return 'game'
+                        return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
                     
             # Use the global background setting for the color.
             if GlobalSettings.dark_background:
@@ -124,12 +126,12 @@ def selection_screen(screen, width, height, mode):
                 player_rect = player_surface.get_rect(center=player1_rect.center)
                 screen.blit(player_surface, player_rect)
                 
-                computer_surface = font.render("Computer", True, (255, 255, 255))
+                computer_surface = font.render("Computer 2", True, (255, 255, 255))
                 computer_rect = computer_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer_surface, computer_rect)
                 
-                dropdown_menu.handle_event(event)
-                dropdown_menu.draw(screen)
+                dropdown_menu2.handle_event(event)
+                dropdown_menu2.draw(screen)
                 
             if mode.lower() == 'multiplayer':
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
@@ -141,13 +143,19 @@ def selection_screen(screen, width, height, mode):
                 screen.blit(player2_text_surface, player2_text_rect)
                 
             if mode.lower() == 'computer':
-                computer1_surface = font.render("Computer", True, (255, 255, 255))
+                computer1_surface = font.render("Computer 1", True, (255, 255, 255))
                 computer1_rect = computer1_surface.get_rect(center=player1_rect.center)
                 screen.blit(computer1_surface, computer1_rect)
                 
-                computer2_surface = font.render("Computer", True, (255, 255, 255))
+                computer2_surface = font.render("Computer 2", True, (255, 255, 255))
                 computer2_rect = computer2_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer2_surface, computer2_rect)
+                
+                dropdown_menu1.handle_event(event)
+                dropdown_menu1.draw(screen)
+                
+                dropdown_menu2.handle_event(event)
+                dropdown_menu2.draw(screen)
                 
                 
             # Draw Return to Home button
