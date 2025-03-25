@@ -1,10 +1,55 @@
 import pygame
 import GlobalSettings
 
+# A class to handle dropdown menus
+class Dropdown:
+    def __init__(self, x, y, width, height, options, title, font):
+        self.title = title
+        self.title_rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(x, y + height + 5, width, height)
+        self.options = options
+        self.selected_index = 0
+        self.expanded = False
+        self.font = font
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, GlobalSettings.gray, self.title_rect)
+        
+        title_surface = self.font.render(self.title, True, GlobalSettings.white)
+        title_rect_final = title_surface.get_rect(center=self.title_rect.center)
+        screen.blit(title_surface, title_rect_final)
+        
+        pygame.draw.rect(screen, GlobalSettings.gray, self.rect)
+        pygame.draw.rect(screen, GlobalSettings.neutral_color, self.rect, width=4)
+
+        selection_surface = self.font.render(self.options[self.selected_index], True, GlobalSettings.white)
+        selection_rect_final = selection_surface.get_rect(center=self.rect.center)
+        screen.blit(selection_surface, selection_rect_final)
+
+        if self.expanded:
+            for i, option in enumerate(self.options):
+                option_rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height, self.rect.width, self.rect.height)
+                pygame.draw.rect(screen, GlobalSettings.gray, option_rect)
+                
+                option_surface = self.font.render(option, True, GlobalSettings.white)
+                option_rect_final = option_surface.get_rect(center=option_rect.center)
+                screen.blit(option_surface, option_rect_final)
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.expanded = not self.expanded
+            elif self.expanded:
+                for i in range(len(self.options)):
+                    option_rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height, self.rect.width, self.rect.height)
+                    if option_rect.collidepoint(event.pos):
+                        self.selected_index = i
+                        self.expanded = False
+                        
 def selection_screen(screen, width, height, mode):
     clock = pygame.time.Clock()
     FPS = 60
-
+    
 
     # Preload font
     font = pygame.font.Font(None, 36)
@@ -18,6 +63,8 @@ def selection_screen(screen, width, height, mode):
     player1_box = pygame.Rect(width // 2 - 560, 215, 70, 70)
     player2_rect = pygame.Rect(width // 2 + 200, 200, 400, 100)
     player2_box = pygame.Rect(width // 2 + 490, 215, 70, 70)
+    
+    dropdown_menu = Dropdown(width // 2 + 200, 350, 400, 50, ['Best Move First', 'Worst Move First', 'DFS', 'BFS'], "Select a computer setting:", font)
 
     running = True
     while running:
@@ -80,6 +127,9 @@ def selection_screen(screen, width, height, mode):
                 computer_surface = font.render("Computer", True, (255, 255, 255))
                 computer_rect = computer_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer_surface, computer_rect)
+                
+                dropdown_menu.handle_event(event)
+                dropdown_menu.draw(screen)
                 
             if mode.lower() == 'multiplayer':
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
