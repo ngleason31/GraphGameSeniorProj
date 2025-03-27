@@ -32,7 +32,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
     CPU_TURN_EVENT = pygame.USEREVENT + 2
-    pygame.time.set_timer(CPU_TURN_EVENT, 250) # CPU logic every 1 second
+    pygame.time.set_timer(CPU_TURN_EVENT, 250) # CPU logic every 0.25 seconds
 
     running = True
     while running:
@@ -55,14 +55,14 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             elif event.type == MOUSEBUTTONDOWN:
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 50:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         x = planets[0].x + x_offset
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
-                        scoreboard.update_player(-50)
+                        scoreboard.update_player(-250)
                     
                     #Selects a single ship in the hitbox randomly (unless shift is being pressed)
                     if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
@@ -218,7 +218,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                 if not in_conflict and target_planet.player_num != ship.player:
                     # normal capture logic
                     if target_planet.health >= 0:
-                        target_planet.change_health(-1)
+                        target_planet.change_health(-3)
                         target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership
@@ -232,7 +232,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
         #Planets healing        
         for planet in planets:
             if not planet.ship_attacking and planet.health < planet.max_health:
-                planet.change_health(1)
+                planet.change_health(5)
             has_ship_attacking = False
             for ship in ships:
                 if ship.curr_planet == planet.id:

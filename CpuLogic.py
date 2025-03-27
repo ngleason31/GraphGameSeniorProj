@@ -115,15 +115,15 @@ def handle_cpu_turn(setting, scoreboard, planets, ships, home_planet, player_num
                         ship.set_target(planets[worst_next_step_id])
                             
                 # Auto-spawn CPU ships if enough score
-                while scoreboard.get_scores()[player_num - 1] >= 50:
+                while scoreboard.get_scores()[player_num - 1] >= 250:
                     x_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                     y_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                     ships.append(Ship(home_planet.x + x_offset, home_planet.y + y_offset,
                             home_planet.id, player=player_num))
                     if player_num == GlobalSettings.opposing_player:
-                        scoreboard.update_opponent(-50)
+                        scoreboard.update_opponent(-250)
                     else:
-                        scoreboard.update_player(-50)
+                        scoreboard.update_player(-250)
                 #For each CPU ship, pick the best planet to capture and move one step along BFS
                 for ship in ships:
                     if ship.player != player_num:
