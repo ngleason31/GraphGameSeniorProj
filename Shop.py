@@ -17,7 +17,7 @@ class Shop:
         pygame.draw.polygon(screen, GlobalSettings.player_colors[GlobalSettings.curr_player], triangle_points, width=4)
         
         font = pygame.font.Font(None, 25)
-        text_surface = font.render("50", True, (255, 255, 255))
+        text_surface = font.render("250", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.centery - 15))
         screen.blit(text_surface, text_rect)
     
