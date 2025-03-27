@@ -32,7 +32,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
     CPU_TURN_EVENT = pygame.USEREVENT + 2
-    pygame.time.set_timer(CPU_TURN_EVENT, 1000) # CPU logic every 1 second
+    pygame.time.set_timer(CPU_TURN_EVENT, 250) # CPU logic every 1 second
 
     running = True
     while running:
