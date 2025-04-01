@@ -4,7 +4,6 @@ import GlobalSettings
 
 def runSettings(screen, WIDTH, HEIGHT):
     # Get display dimensions
-    pygame.display.set_caption("Settings")
     clock = pygame.time.Clock()
     FPS = 60
 
@@ -102,10 +101,3 @@ def runSettings(screen, WIDTH, HEIGHT):
             clock.tick(FPS)
 
     return "home"
-
-# For standalone testing:
-if __name__ == "__main__":
-    result = runSettings()
-    if result == "quit":
-        pygame.quit()
-        sys.exit()

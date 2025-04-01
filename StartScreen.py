@@ -4,12 +4,8 @@ import sys
 import GlobalSettings
 from pygame.locals import *
 
-
 pygame.init()   
  
-#Screen Dimensions
-pygame.display.set_caption("Welcome Screen")
-
 #Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -45,22 +41,25 @@ def draw_button(surface, text, rect, inactive_color, active_color):
 
 
 def welcomeScreen(screen, screenWidth, screenHeight):
+
     clock = pygame.time.Clock()
     running = True
 
     welcomeY = screenHeight // 4
     buttonWidth = 200
-    buttonHeight = 50
+    buttonHeight = 40
     buttonX = screenWidth // 2 - buttonWidth // 2
-    button1_Y = welcomeY + 340
-    button2_Y = welcomeY + 400
-    button3_Y = welcomeY + 460
-    button4_Y = welcomeY + 520
+    button1_Y = welcomeY + 330
+    button2_Y = welcomeY + 380
+    button3_Y = welcomeY + 430
+    button4_Y = welcomeY + 480
+    button5_Y = welcomeY + 530
 
     button1_rect = pygame.Rect(buttonX, button1_Y, buttonWidth, buttonHeight)
     button2_rect = pygame.Rect(buttonX, button2_Y, buttonWidth, buttonHeight)
     button3_rect = pygame.Rect(buttonX, button3_Y, buttonWidth, buttonHeight)
     button4_rect = pygame.Rect(buttonX, button4_Y, buttonWidth, buttonHeight)
+    button5_rect = pygame.Rect(buttonX, button5_Y, buttonWidth, buttonHeight)
 
     base_triangle = [(0, -60), (-70, 60), (70, 60)]
     triangle_center_y = welcomeY + 75
@@ -126,23 +125,23 @@ def welcomeScreen(screen, screenWidth, screenHeight):
         pygame.draw.polygon(screen, blue, triangle2_points, width=6)
 
         #Draw Buttons
-        if draw_button(screen, "1 Player", button1_rect, gray, black):
-            print("Player 1 button clicked!")
-            selectedOption = "player 1"
+        if draw_button(screen, "Single Player", button1_rect, gray, black):
+            selectedOption = "single player"
             running = False
 
-        if draw_button(screen, "2 Players", button2_rect, gray, black):
-            print("Player 2 button clicked!")
-            selectedOption = "player 2"
+        if draw_button(screen, "Multiplayer", button2_rect, gray, black):
+            selectedOption = "multiplayer"
+            running = False
+            
+        if draw_button(screen, "Computer", button3_rect, gray, black):
+            selectedOption = "computer"
             running = False
 
-        if draw_button(screen, "Settings", button3_rect, gray, black):
-            print("Settings button clicked!")
+        if draw_button(screen, "Settings", button4_rect, gray, black):
             selectedOption = "settings"
             running = False
 
-        if draw_button(screen, "Credits", button4_rect, gray, black):  
-            print("Credits button clicked!")
+        if draw_button(screen, "Credits", button5_rect, gray, black):  
             selectedOption = "credits"
             running = False
 
