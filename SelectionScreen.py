@@ -142,12 +142,26 @@ def selection_screen(screen, width, height, mode):
                 computer_rect = computer_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer_surface, computer_rect)
                 
-                dropdown_menu2.handle_event(event)
-                dropdown_menu2.draw(screen)
+                # dropdown_menu2.handle_event(event)
+                # dropdown_menu2.draw(screen)
+                
+                # difficulty_menu2.handle_event(event)
+                # GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                # difficulty_menu2.draw(screen)
+
+
                 
                 difficulty_menu2.handle_event(event)
                 GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
                 difficulty_menu2.draw(screen)
+
+                dropdown_menu2.handle_event(event)
+                dropdown_menu2.draw(screen)
+
+                
+
+
+
                 
             if mode.lower() == 'multiplayer':
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
@@ -174,12 +188,19 @@ def selection_screen(screen, width, height, mode):
                 GlobalSettings.computer1_difficulty = difficulty_menu1.options[difficulty_menu1.selected_index]
                 difficulty_menu1.draw(screen)
                 
-                dropdown_menu2.handle_event(event)
-                dropdown_menu2.draw(screen)
+                # dropdown_menu2.handle_event(event)
+                # dropdown_menu2.draw(screen)
                 
+                # difficulty_menu2.handle_event(event)
+                # GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                # difficulty_menu2.draw(screen)
+
                 difficulty_menu2.handle_event(event)
                 GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
                 difficulty_menu2.draw(screen)
+
+                dropdown_menu2.handle_event(event)
+                dropdown_menu2.draw(screen)
                 
             # Draw Return to Home button
             return_surface = font.render("Return to Home", True, (255, 255, 255))
