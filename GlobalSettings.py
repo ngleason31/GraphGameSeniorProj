@@ -20,6 +20,8 @@ red = (255, 0, 0)
 computer1_difficulty = 'Medium'
 computer2_difficulty = 'Medium'
 
+shipcounts = [0, 0]
+
 curr_player = 0
 opposing_player = 0
 

@@ -70,7 +70,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             elif event.type == MOUSEBUTTONDOWN:
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcount[0] < 250:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
@@ -78,6 +78,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
+                        GlobalSettings.shipcount[0] += 1
                     
                     #Selects a single ship in the hitbox randomly (unless shift is being pressed)
                     if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
@@ -220,6 +221,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                 if s.health <= 0:
                     ship_list.remove(s)
                     ships.remove(s)
+                    GlobalSettings.shipcounts[s.player - 1] -= 1
 
 
         # Capture Logic: Check if any ship has reached its target planet.
