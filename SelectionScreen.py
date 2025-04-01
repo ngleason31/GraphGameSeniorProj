@@ -14,26 +14,26 @@ class Dropdown:
 
     def draw(self, screen):
         pygame.draw.rect(screen, GlobalSettings.gray, self.title_rect)
-        
         title_surface = self.font.render(self.title, True, GlobalSettings.white)
         title_rect_final = title_surface.get_rect(center=self.title_rect.center)
         screen.blit(title_surface, title_rect_final)
         
         pygame.draw.rect(screen, GlobalSettings.gray, self.rect)
         pygame.draw.rect(screen, GlobalSettings.neutral_color, self.rect, width=4)
-
         selection_surface = self.font.render(self.options[self.selected_index], True, GlobalSettings.white)
         selection_rect_final = selection_surface.get_rect(center=self.rect.center)
         screen.blit(selection_surface, selection_rect_final)
 
         if self.expanded:
             for i, option in enumerate(self.options):
-                option_rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height, self.rect.width, self.rect.height)
-                pygame.draw.rect(screen, GlobalSettings.gray, option_rect)
-                
-                option_surface = self.font.render(option, True, GlobalSettings.white)
-                option_rect_final = option_surface.get_rect(center=option_rect.center)
-                screen.blit(option_surface, option_rect_final)
+                option_rect = pygame.Rect(
+                    self.rect.x, 
+                    self.rect.y + (i + 1) * self.rect.height, 
+                    self.rect.width, 
+                    self.rect.height
+                )
+                # Use the hover effect only for these expanded choices.
+                draw_shaded_button(screen, option_rect, option, self.font)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -45,18 +45,30 @@ class Dropdown:
                     if option_rect.collidepoint(event.pos):
                         self.selected_index = i
                         self.expanded = False
+
+
+def draw_shaded_button(screen, rect, text, font):
+    # Draw a shaded button with a hover effect.
+    mouse = pygame.mouse.get_pos()
+    # Use hover color if the mouse is over the button, otherwise use base color.
+    color = GlobalSettings.black if rect.collidepoint(mouse) else GlobalSettings.gray
+    pygame.draw.rect(screen, color, rect)
+    
+    # Render and center the text on the button.
+    text_surface = font.render(text, True, GlobalSettings.white)
+    text_rect = text_surface.get_rect(center=rect.center)
+    screen.blit(text_surface, text_rect)
                         
 def selection_screen(screen, width, height, mode):
     clock = pygame.time.Clock()
     FPS = 60
     
-
     # Preload font
     font = pygame.font.Font(None, 36)
     
     #Button definitions
-    return_button_rect = pygame.Rect(width // 2 - 300, height - 200, 200, 50)
-    continue_button_rect = pygame.Rect(width // 2 + 100, height - 200, 200, 50)
+    return_button_rect = pygame.Rect(width // 2 - 100, height - 200, 200, 50)
+    continue_button_rect = pygame.Rect(width // 2 - 100 , height - 300, 200, 50)
     
     #Selection definitions
     player1_rect = pygame.Rect(width // 2 - 600, 200, 400, 100)
@@ -142,15 +154,6 @@ def selection_screen(screen, width, height, mode):
                 computer_rect = computer_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer_surface, computer_rect)
                 
-                # dropdown_menu2.handle_event(event)
-                # dropdown_menu2.draw(screen)
-                
-                # difficulty_menu2.handle_event(event)
-                # GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
-                # difficulty_menu2.draw(screen)
-
-
-                
                 difficulty_menu2.handle_event(event)
                 GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
                 difficulty_menu2.draw(screen)
@@ -158,11 +161,7 @@ def selection_screen(screen, width, height, mode):
                 dropdown_menu2.handle_event(event)
                 dropdown_menu2.draw(screen)
 
-                
-
-
-
-                
+                            
             if mode.lower() == 'multiplayer':
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
                 player1_text_rect = player1_text_surface.get_rect(center=player1_rect.center)
@@ -187,13 +186,6 @@ def selection_screen(screen, width, height, mode):
                 difficulty_menu1.handle_event(event)
                 GlobalSettings.computer1_difficulty = difficulty_menu1.options[difficulty_menu1.selected_index]
                 difficulty_menu1.draw(screen)
-                
-                # dropdown_menu2.handle_event(event)
-                # dropdown_menu2.draw(screen)
-                
-                # difficulty_menu2.handle_event(event)
-                # GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
-                # difficulty_menu2.draw(screen)
 
                 difficulty_menu2.handle_event(event)
                 GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
@@ -206,11 +198,9 @@ def selection_screen(screen, width, height, mode):
             return_surface = font.render("Return to Home", True, (255, 255, 255))
             return_rect = return_surface.get_rect(center=return_button_rect.center)
             screen.blit(return_surface, return_rect)
-            
-            # Draw Return to Home button
-            continue_surface = font.render("Play Game", True, (255, 255, 255))
-            continue_rect = continue_surface.get_rect(center=continue_button_rect.center)
-            screen.blit(continue_surface, continue_rect)
+
+            draw_shaded_button(screen, return_button_rect, "Return to Home", font)
+            draw_shaded_button(screen, continue_button_rect, "Play Game", font)
 
             pygame.display.flip()
             clock.tick(FPS)
