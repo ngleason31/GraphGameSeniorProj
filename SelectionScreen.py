@@ -65,9 +65,13 @@ def selection_screen(screen, width, height, mode):
     player2_box = pygame.Rect(width // 2 + 490, 215, 70, 70)
     
     cpu_options = ['Best Move First', 'Worst Move First', 'Highest Scoring First', 'Lowest Scoring First', 'DFS', 'BFS']
+    difficulty_options = ['Easy', 'Medium', 'Hard']
     
     dropdown_menu1 = Dropdown(width // 2 - 600, 350, 400, 50, cpu_options, "Select settings for Computer 1:", font)
     dropdown_menu2 = Dropdown(width // 2 + 200, 350, 400, 50, cpu_options, "Select settings for Computer 2:", font)
+    
+    difficulty_menu1 = Dropdown(width // 2 - 600, 500, 400, 50, difficulty_options, "Select difficulty", font)
+    difficulty_menu2 = Dropdown(width // 2 + 200, 500, 400, 50, difficulty_options, "Select difficulty", font)
 
 
     running = True
@@ -141,6 +145,10 @@ def selection_screen(screen, width, height, mode):
                 dropdown_menu2.handle_event(event)
                 dropdown_menu2.draw(screen)
                 
+                difficulty_menu2.handle_event(event)
+                GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                difficulty_menu2.draw(screen)
+                
             if mode.lower() == 'multiplayer':
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
                 player1_text_rect = player1_text_surface.get_rect(center=player1_rect.center)
@@ -162,9 +170,16 @@ def selection_screen(screen, width, height, mode):
                 dropdown_menu1.handle_event(event)
                 dropdown_menu1.draw(screen)
                 
+                difficulty_menu1.handle_event(event)
+                GlobalSettings.computer1_difficulty = difficulty_menu1.options[difficulty_menu1.selected_index]
+                difficulty_menu1.draw(screen)
+                
                 dropdown_menu2.handle_event(event)
                 dropdown_menu2.draw(screen)
                 
+                difficulty_menu2.handle_event(event)
+                GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                difficulty_menu2.draw(screen)
                 
             # Draw Return to Home button
             return_surface = font.render("Return to Home", True, (255, 255, 255))

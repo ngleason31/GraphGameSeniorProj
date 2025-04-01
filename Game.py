@@ -31,8 +31,23 @@ def runGame(screen, cpu1_setting, cpu2_setting):
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
-    CPU_TURN_EVENT = pygame.USEREVENT + 2
-    pygame.time.set_timer(CPU_TURN_EVENT, 250) # CPU logic every 0.25 seconds
+    CPU1_TURN_EVENT = pygame.USEREVENT + 2
+    CPU2_TURN_EVENT = pygame.USEREVENT + 3
+    
+    if GlobalSettings.computer1_difficulty.lower() == 'easy':
+        pygame.time.set_timer(CPU1_TURN_EVENT, 3000)
+    elif GlobalSettings.computer1_difficulty.lower() == 'medium':
+        pygame.time.set_timer(CPU1_TURN_EVENT, 1000)
+    elif GlobalSettings.computer1_difficulty.lower() == 'hard':
+        pygame.time.set_timer(CPU1_TURN_EVENT, 250)
+        
+    if GlobalSettings.computer2_difficulty.lower() == 'easy':
+        pygame.time.set_timer(CPU2_TURN_EVENT, 3000)
+    elif GlobalSettings.computer2_difficulty.lower() == 'medium':
+        pygame.time.set_timer(CPU2_TURN_EVENT, 1000)
+    elif GlobalSettings.computer2_difficulty.lower() == 'hard':
+        pygame.time.set_timer(CPU2_TURN_EVENT, 250)
+
 
     running = True
     while running:
@@ -89,10 +104,11 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                                 ship.set_target(clicked_planet)
             
             # Handle CPU turn event every 3 seconds
-            elif event.type == CPU_TURN_EVENT:
+            elif event.type == CPU1_TURN_EVENT:
                 if cpu1_setting != None:
                     #Handles first cpu turn
                     handle_cpu_turn(cpu1_setting, scoreboard, planets, ships, planets[0], GlobalSettings.curr_player)
+            elif event.type == CPU2_TURN_EVENT:
                 if cpu2_setting != None:
                     #Handles second cpu turn
                     handle_cpu_turn(cpu2_setting, scoreboard, planets, ships, planets[1], GlobalSettings.opposing_player)
