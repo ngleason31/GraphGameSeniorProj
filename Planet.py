@@ -22,7 +22,11 @@ class Planet:
         self.color = GlobalSettings.player_colors[player_num]
         
     def change_health(self, health):
-        self.health += health
+        if self.health < self.max_health:
+            self.health += health
+        
+        if self.health > self.max_health:
+            self.health = self.max_health
         
     def draw(self, screen, planets):
         #Drawing the planet itself
