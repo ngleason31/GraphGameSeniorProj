@@ -291,7 +291,6 @@ def runGame(screen, cpu1_setting, cpu2_setting):
 
     return
 
-
 def pauseMenu(screen, WIDTH, HEIGHT):
     pause_font = pygame.font.Font(None, 72)
     option_font = pygame.font.Font(None, 48)
@@ -299,7 +298,13 @@ def pauseMenu(screen, WIDTH, HEIGHT):
     resume_text = option_font.render("Press R to Resume", True, GlobalSettings.neutral_color)
     quit_text = option_font.render("Press Q to Quit", True, GlobalSettings.neutral_color)
     
+    # Define volume slider variables.
+    volume_slider_rect = pygame.Rect(WIDTH // 2 - 110, HEIGHT // 2 + 150, 220, 10)
+    slider_handle_radius = 10
+    dragging_slider = False
+    
     paused = True
+    clock = pygame.time.Clock()
     while paused:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -309,12 +314,28 @@ def pauseMenu(screen, WIDTH, HEIGHT):
                     paused = False
                 elif event.key == pygame.K_q:  # Quit game
                     return "home"
-        
-        # Fill screen with background color based on current settings
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click only
+                    mouse = pygame.mouse.get_pos()
+                    if volume_slider_rect.collidepoint(mouse):
+                        dragging_slider = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    dragging_slider = False
+            elif event.type == pygame.MOUSEMOTION:
+                if dragging_slider:
+                    mouse_x = event.pos[0]
+                    relative_x = mouse_x - volume_slider_rect.x
+                    new_volume = relative_x / volume_slider_rect.width
+                    new_volume = max(0, min(new_volume, 1))  # Clamp between 0 and 1
+                    GlobalSettings.volume = new_volume
+                    pygame.mixer.music.set_volume(new_volume)
+
+        # Fill screen with background color based on current settings.
         bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
         screen.fill(bg_color)
         
-        # Draw pause texts
+        # Draw pause texts.
         pause_rect = pause_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
         resume_rect = resume_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
@@ -322,14 +343,27 @@ def pauseMenu(screen, WIDTH, HEIGHT):
         screen.blit(resume_text, resume_rect)
         screen.blit(quit_text, quit_rect)
         
+        # Draw volume slider bar.
+        pygame.draw.rect(screen, GlobalSettings.gray, volume_slider_rect)
+        # Calculate the handle's position based on the current volume.
+        handle_x = volume_slider_rect.x + int(GlobalSettings.volume * volume_slider_rect.width)
+        handle_y = volume_slider_rect.centery
+        mouse = pygame.mouse.get_pos()
+        handle_color = GlobalSettings.black if volume_slider_rect.collidepoint(mouse) else GlobalSettings.gray
+        pygame.draw.circle(screen, handle_color, (handle_x, handle_y), slider_handle_radius)
+        # Render the volume percentage above the slider bar.
+        vol_percentage = int(GlobalSettings.volume * 100)
+        vol_text = option_font.render(f"Volume: {vol_percentage}%", True, GlobalSettings.neutral_color)
+        vol_rect = vol_text.get_rect(midbottom=(volume_slider_rect.centerx, volume_slider_rect.y - 10))
+        screen.blit(vol_text, vol_rect)
+        
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
     
     return "resume"
 
+
 def checkForWinner(planets):
-    # Assume that a planet with player_num 0 is neutral.
-    # If all planets are owned by the same non-zero player, that player wins.
     first_owner = planets[0].player_num
     if first_owner == 0:
         return None

@@ -84,8 +84,10 @@ def planet_generator():
     #Generates planets that are at least close to another planet, but far enough from all planets not to overlap
     for id in range(num_planets - 2):
         radius = random.randint(15, 30)
+        attempts = 0
         planet_found = False
-        while not planet_found:
+        while not planet_found and attempts < 1000:
+            attempts += 1
             x = random.randint(150, GlobalSettings.WIDTH - 150)
             y = random.randint(150, GlobalSettings.HEIGHT - 150)
             for planet in planets:
@@ -99,8 +101,9 @@ def planet_generator():
                 planets.append(Planet(id + 2, x, y, radius))
     
     #Creates connections between planets
-    for first_planet_id in range(num_planets):
-        for second_planet_id in range(first_planet_id + 1, num_planets):
+    num_actual_planets = len(planets)
+    for first_planet_id in range(num_actual_planets):
+        for second_planet_id in range(first_planet_id + 1, num_actual_planets):
             first_planet = planets[first_planet_id]
             second_planet = planets[second_planet_id]
             distance = math.sqrt((first_planet.x - second_planet.x) ** 2 + (first_planet.y - second_planet.y) ** 2)
@@ -119,19 +122,33 @@ def planet_generator():
 
 
 #Helper planet BFS function
-def planet_BFS(start, goal, planets):
-    stack = [start]
-    visited = []
+# def planet_BFS(start, goal, planets):
+#     stack = [start]
+#     visited = []
     
-    while stack:
-        planet = stack.pop(0)
-        visited.append(planet.id)
-        for connection in planet.connections:
-            if planet == goal:
-                return True
-            if connection not in visited:
-                stack.append(planets[connection])
+#     while stack:
+#         planet = stack.pop(0)
+#         visited.append(planet.id)
+#         for connection in planet.connections:
+#             if planet == goal:
+#                 return True
+#             if connection not in visited:
+#                 stack.append(planets[connection])
                 
+#     return False
+
+def planet_BFS(start, goal, planets):
+    queue = [start]
+    visited = set()
+    while queue:
+        current = queue.pop(0)
+        if current == goal:
+            return True
+        visited.add(current.id)
+        for connection in current.connections:
+            neighbor = planets[connection]
+            if neighbor.id not in visited:
+                queue.append(neighbor)
     return False
 
 #Function to check if a certain x, y is in a planet (square hitbox for simplicity)
