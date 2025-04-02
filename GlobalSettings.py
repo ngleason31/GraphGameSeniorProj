@@ -1,7 +1,7 @@
 import pygame
 
 #Global Variables
-audio_on = True    
+audio_on = False  
 dark_background = True 
 volume = 1.0
 
