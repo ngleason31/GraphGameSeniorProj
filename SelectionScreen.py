@@ -180,12 +180,12 @@ def selection_screen(screen, width, height, mode):
                 computer2_rect = computer2_surface.get_rect(center=player2_rect.center)
                 screen.blit(computer2_surface, computer2_rect)
                 
-                dropdown_menu1.handle_event(event)
-                dropdown_menu1.draw(screen)
-                
                 difficulty_menu1.handle_event(event)
                 GlobalSettings.computer1_difficulty = difficulty_menu1.options[difficulty_menu1.selected_index]
                 difficulty_menu1.draw(screen)
+                
+                dropdown_menu1.handle_event(event)
+                dropdown_menu1.draw(screen)
 
                 difficulty_menu2.handle_event(event)
                 GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
