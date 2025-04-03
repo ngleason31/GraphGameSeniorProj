@@ -14,6 +14,7 @@ class Ship:
         self.curr_planet = curr_planet
         self.next_planet = curr_planet
         self.curr_target = self.pos
+        self.final_target = None
         self.is_selected = False
         self.max_health = 20
         self.health = 20
@@ -58,6 +59,9 @@ class Ship:
         self.curr_target = pygame.Vector2(x, y)
         self.landed = False
     
+    def set_final_target(self, planet):
+        self.final_target = planet.id
+
     def update_position(self):
         if self.pos != self.curr_target:
             direction = (self.curr_target - self.pos).normalize()

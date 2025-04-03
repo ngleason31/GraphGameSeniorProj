@@ -3,7 +3,7 @@ import random
 import sys
 import math
 from Planet import planet_generator, planet_loc
-from CpuLogic import handle_cpu_turn
+from ShipLogic import handle_turn
 from Scoreboard import Scoreboard
 from Ship import Ship
 from Shop import Shop
@@ -31,22 +31,22 @@ def runGame(screen, cpu1_setting, cpu2_setting):
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
-    CPU1_TURN_EVENT = pygame.USEREVENT + 2
-    CPU2_TURN_EVENT = pygame.USEREVENT + 3
+    TURN_EVENT1 = pygame.USEREVENT + 2
+    TURN_EVENT2 = pygame.USEREVENT + 3
     
     if GlobalSettings.computer1_difficulty.lower() == 'easy':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 3000)
+        pygame.time.set_timer(TURN_EVENT1, 3000)
     elif GlobalSettings.computer1_difficulty.lower() == 'medium':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 1000)
+        pygame.time.set_timer(TURN_EVENT1, 1000)
     elif GlobalSettings.computer1_difficulty.lower() == 'hard':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 250)
+        pygame.time.set_timer(TURN_EVENT1, 250)
         
     if GlobalSettings.computer2_difficulty.lower() == 'easy':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 3000)
+        pygame.time.set_timer(TURN_EVENT2, 3000)
     elif GlobalSettings.computer2_difficulty.lower() == 'medium':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 1000)
+        pygame.time.set_timer(TURN_EVENT2, 1000)
     elif GlobalSettings.computer2_difficulty.lower() == 'hard':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 250)
+        pygame.time.set_timer(TURN_EVENT2, 250)
 
 
     running = True
@@ -70,7 +70,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             elif event.type == MOUSEBUTTONDOWN:
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcount[0] < 250:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcounts[0] < 250:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
@@ -78,7 +78,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
-                        GlobalSettings.shipcount[0] += 1
+                        GlobalSettings.shipcounts[0] += 1
                     
                     #Selects a single ship in the hitbox randomly (unless shift is being pressed)
                     if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
@@ -99,20 +99,13 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                     # Movement Logic: Use the clicked planet to set the ship's target.
                     if clicked_planet is not None:
                         for ship in selected_ships:
-                            current_planet = planets[ship.curr_planet]
-                            # Check if the clicked planet is connected to the ship's current planet.
-                            if clicked_planet.id in current_planet.connections:
-                                ship.set_target(clicked_planet)
+                            ship.final_target = clicked_planet.id
             
             # Handle CPU turn event every 3 seconds
-            elif event.type == CPU1_TURN_EVENT:
-                if cpu1_setting != None:
-                    #Handles first cpu turn
-                    handle_cpu_turn(cpu1_setting, scoreboard, planets, ships, planets[0], GlobalSettings.curr_player)
-            elif event.type == CPU2_TURN_EVENT:
-                if cpu2_setting != None:
-                    #Handles second cpu turn
-                    handle_cpu_turn(cpu2_setting, scoreboard, planets, ships, planets[1], GlobalSettings.opposing_player)
+            elif event.type == TURN_EVENT1:
+                handle_turn(cpu1_setting, scoreboard, planets, ships, planets[0], GlobalSettings.curr_player)
+            elif event.type == TURN_EVENT2:
+                handle_turn(cpu2_setting, scoreboard, planets, ships, planets[1], GlobalSettings.opposing_player)
                         
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:

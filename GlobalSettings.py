@@ -18,8 +18,8 @@ blue = (0, 0, 255)
 green = (0, 255, 0)
 red = (255, 0, 0)
 
-computer1_difficulty = 'Medium'
-computer2_difficulty = 'Medium'
+computer1_difficulty = 'Hard'
+computer2_difficulty = 'Hard'
 
 shipcounts = [0, 0]
 
