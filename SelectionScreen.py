@@ -59,7 +59,7 @@ def draw_shaded_button(screen, rect, text, font):
     text_rect = text_surface.get_rect(center=rect.center)
     screen.blit(text_surface, text_rect)
                         
-def selection_screen(screen, width, height, mode):
+def selection_screen(screen, width, height, mode, player1, player2):
     clock = pygame.time.Clock()
     FPS = 60
     
@@ -100,11 +100,11 @@ def selection_screen(screen, width, height, mode):
                 
                 if continue_button_rect.collidepoint(mouse):
                         if mode.lower() == 'single player':
-                            return ['game', None, dropdown_menu2.options[dropdown_menu2.selected_index]]
+                            return ['game', 'player', dropdown_menu2.options[dropdown_menu2.selected_index]]
                         if mode.lower() == 'computer':
                             return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
                         else:
-                            return ['game', None, None]
+                            return ['game', 'player', 'player']
                                     
                     
             # Use the global background setting for the color.
@@ -155,7 +155,7 @@ def selection_screen(screen, width, height, mode):
                 screen.blit(computer_surface, computer_rect)
                 
                 difficulty_menu2.handle_event(event)
-                GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                player2.change_difficulty(difficulty_menu2.options[difficulty_menu2.selected_index])
                 difficulty_menu2.draw(screen)
 
                 dropdown_menu2.handle_event(event)
@@ -181,14 +181,14 @@ def selection_screen(screen, width, height, mode):
                 screen.blit(computer2_surface, computer2_rect)
                 
                 difficulty_menu1.handle_event(event)
-                GlobalSettings.computer1_difficulty = difficulty_menu1.options[difficulty_menu1.selected_index]
+                player1.change_difficulty(difficulty_menu1.options[difficulty_menu1.selected_index])
                 difficulty_menu1.draw(screen)
                 
                 dropdown_menu1.handle_event(event)
                 dropdown_menu1.draw(screen)
 
                 difficulty_menu2.handle_event(event)
-                GlobalSettings.computer2_difficulty = difficulty_menu2.options[difficulty_menu2.selected_index]
+                player2.change_difficulty(difficulty_menu2.options[difficulty_menu2.selected_index])
                 difficulty_menu2.draw(screen)
 
                 dropdown_menu2.handle_event(event)

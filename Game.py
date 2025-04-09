@@ -3,6 +3,7 @@ import random
 import sys
 import math
 from Planet import planet_generator, planet_loc
+from Player import Player
 from ShipLogic import handle_turn
 from Scoreboard import Scoreboard
 from Ship import Ship
@@ -13,11 +14,11 @@ import GlobalSettings
 FPS = 60
 FramePerSec = pygame.time.Clock()
 
-def runGame(screen, cpu1_setting, cpu2_setting):
+def runGame(screen, player1, player2):
     planets = planet_generator()
     ships = []
     selected_ships = []
-    scoreboard = Scoreboard()
+    scoreboard = Scoreboard(player1, player2)
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
     shop = Shop()
@@ -34,18 +35,18 @@ def runGame(screen, cpu1_setting, cpu2_setting):
     TURN_EVENT1 = pygame.USEREVENT + 2
     TURN_EVENT2 = pygame.USEREVENT + 3
     
-    if GlobalSettings.computer1_difficulty.lower() == 'easy':
+    if player1.difficulty.lower() == 'easy':
         pygame.time.set_timer(TURN_EVENT1, 3000)
-    elif GlobalSettings.computer1_difficulty.lower() == 'medium':
+    elif player1.difficulty.lower() == 'medium':
         pygame.time.set_timer(TURN_EVENT1, 1000)
-    elif GlobalSettings.computer1_difficulty.lower() == 'hard':
+    elif player1.difficulty.lower() == 'hard':
         pygame.time.set_timer(TURN_EVENT1, 250)
         
-    if GlobalSettings.computer2_difficulty.lower() == 'easy':
+    if player2.difficulty.lower() == 'easy':
         pygame.time.set_timer(TURN_EVENT2, 3000)
-    elif GlobalSettings.computer2_difficulty.lower() == 'medium':
+    elif player2.difficulty.lower() == 'medium':
         pygame.time.set_timer(TURN_EVENT2, 1000)
-    elif GlobalSettings.computer2_difficulty.lower() == 'hard':
+    elif player2.difficulty.lower() == 'hard':
         pygame.time.set_timer(TURN_EVENT2, 250)
 
 
@@ -70,7 +71,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             elif event.type == MOUSEBUTTONDOWN:
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcounts[0] < GlobalSettings.ship_limit:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
@@ -78,7 +79,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
-                        GlobalSettings.shipcounts[0] += 1
+                        player1.update_shipcount(1)
                     
                     #Selects a single ship in the hitbox randomly (unless shift is being pressed)
                     if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
@@ -103,9 +104,9 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             
             # Handle CPU turn event every 3 seconds
             elif event.type == TURN_EVENT1:
-                handle_turn(cpu1_setting, scoreboard, planets, ships, planets[0], GlobalSettings.curr_player)
+                handle_turn(player1.settings, scoreboard, planets, ships, planets[0], player1)
             elif event.type == TURN_EVENT2:
-                handle_turn(cpu2_setting, scoreboard, planets, ships, planets[1], GlobalSettings.opposing_player)
+                handle_turn(player2.settings, scoreboard, planets, ships, planets[1], player2)
                         
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
@@ -214,7 +215,10 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                 if s.health <= 0:
                     ship_list.remove(s)
                     ships.remove(s)
-                    GlobalSettings.shipcounts[s.player - 1] -= 1
+                    if s.player == 1:
+                        player1.update_shipcount(-1)
+                    if s.player == 2:
+                        player2.update_shipcount(-1)
 
 
         # Capture Logic: Check if any ship has reached its target planet.

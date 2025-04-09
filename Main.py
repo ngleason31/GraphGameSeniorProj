@@ -7,6 +7,7 @@ import Settings
 import GlobalSettings
 from SelectionScreen import selection_screen
 from Game import runGame
+from Player import Player
 
 pygame.init()
 pygame.mixer.init()
@@ -26,6 +27,9 @@ screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 
+player1 = Player(1, GlobalSettings.orange, 0, 0, 'player')
+player2 = Player(2, GlobalSettings.blue, 1, 1, 'player')
+
 def main(): 
     running = True
     while running:
@@ -41,25 +45,31 @@ def main():
         if option.lower() == "single player":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='single player')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'single player', player1, player2)
             if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() in "multiplayer":   
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
             if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() in "computer":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'computer', player1, player2)
             if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() == "credits":

@@ -4,19 +4,19 @@ import math
 from Ship import Ship
 from collections import deque
 
-def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
+def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                 def cpu_logic():
                     # Auto-spawn CPU ships if enough score
-                    while scoreboard.get_scores()[player_num - 1] >= 250 and GlobalSettings.shipcounts[player_num - 1] < GlobalSettings.ship_limit:
+                    while scoreboard.get_scores()[player.player_num - 1] >= 250 and player.ship_count < GlobalSettings.ship_limit:
                         x_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                         y_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                         ships.append(Ship(home_planet.x + x_offset, home_planet.y + y_offset,
-                                home_planet.id, player=player_num))
-                        if player_num == GlobalSettings.opposing_player:
+                                home_planet.id, player=player.player_num))
+                        if player.player_num == GlobalSettings.opposing_player:
                             scoreboard.update_opponent(-250)
                         else:
                             scoreboard.update_player(-250)
-                        GlobalSettings.shipcounts[player_num - 1] += 1
+                        player.ship_count += 1
                         
                 #Finds the higest adjacent planet and moves to it
                 def best_move_first(ship):
@@ -24,14 +24,14 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     best_next_step_id = None
 
                     adjacent_planets = [planets[i] for i in planets[ship.curr_planet].connections]
-                    candidate_planets = [p for p in adjacent_planets if p.player_num != player_num]
+                    candidate_planets = [p for p in adjacent_planets if p.player_num != player.player_num]
                     
                     #If all planets nearby have been conquered, BFS for the next planet nearby
                     if not candidate_planets:
                         planet_deque = deque(adjacent_planets)
                         while planet_deque:
                             planet = planet_deque.pop()
-                            if planet.player_num != player_num:
+                            if planet.player_num != player.player_num:
                                 best_next_step_id = next_step(ship.curr_planet, planet.id, planets)
                                 break
                             else:
@@ -54,14 +54,14 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     worst_next_step_id = None
 
                     adjacent_planets = [planets[i] for i in planets[ship.curr_planet].connections]
-                    candidate_planets = [p for p in adjacent_planets if p.player_num != player_num]
+                    candidate_planets = [p for p in adjacent_planets if p.player_num != player.player_num]
 
                     #If all planets nearby have been conquered, BFS for the next planet nearby
                     if not candidate_planets:
                         planet_deque = deque(adjacent_planets)
                         while planet_deque:
                             planet = planet_deque.pop()
-                            if planet.player_num != player_num:
+                            if planet.player_num != player.player_num:
                                 worst_next_step_id = next_step(ship.curr_planet, planet.id, planets)
                                 break
                             else:
@@ -85,7 +85,7 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     best_next_step_id = None
                     best_distance = float('inf')
 
-                    non_cpu_planets = [p for p in planets if p.player_num != player_num]
+                    non_cpu_planets = [p for p in planets if p.player_numr != player.player_num]
 
                     for candidate_planet in non_cpu_planets:
                         distance = math.sqrt((current_planet.x - candidate_planet.x) ** 2 +(current_planet.y - candidate_planet.y) ** 2)
@@ -110,7 +110,7 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     worst_next_step_id = None
                     best_distance = float('inf')
 
-                    non_cpu_planets = [p for p in planets if p.player_num != player_num]
+                    non_cpu_planets = [p for p in planets if p.player_num != player.player_num]
 
                     for candidate_planet in non_cpu_planets:
                         distance = math.sqrt((current_planet.x - candidate_planet.x) ** 2 +(current_planet.y - candidate_planet.y) ** 2)
@@ -135,7 +135,7 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     worst_next_step_id = None
                     best_distance = float('inf')
 
-                    non_cpu_planets = [p for p in planets if p.player_num != player_num]
+                    non_cpu_planets = [p for p in planets if p.player_num != player.player_num]
 
                     for candidate_planet in non_cpu_planets:
                         distance = math.sqrt((current_planet.x - candidate_planet.x) ** 2 +(current_planet.y - candidate_planet.y) ** 2)
@@ -161,26 +161,19 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                     ship.set_target(planets[next_step_id])
 
                 #Checks if the logic is a human or cpu player
-                is_cpu = True
-                if setting == None:
-                    is_cpu = False 
-                else:
+                if setting != 'player':
                     cpu_logic()
                     
                 #For each ship, pick the best planet to capture and move one step along BFS
                 for ship in ships:
-                    if ship.player != player_num:
+                    if ship.player != player.player_num:
                         continue  # only manage CPU ships
 
                     current_planet = planets[ship.curr_planet]
 
-                    #If its not, just handle the logic as a human player
-                    if not is_cpu:
-                        ship_logic(ship)
-                        continue
                     #If physically on a planet that isn't owned yet, skip movement (still capturing), or if it has not and is AI
                     distance = math.hypot(ship.x - current_planet.x, ship.y - current_planet.y)
-                    if distance < current_planet.radius and current_planet.player_num != player_num:
+                    if distance < current_planet.radius and current_planet.player_num != player.player_num:
                         continue
                     
                     if setting.lower() == 'best move first':
@@ -191,8 +184,7 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                         highest_scoring_first(ship)
                     elif setting.lower() == 'lowest scoring first':
                         lowest_scoring_first(ship)
-                    else:
-                        ship_logic(ship)
+                    ship_logic(ship)
                         
 def next_step(start_planet_id, goal_planet_id, planets):
     """
