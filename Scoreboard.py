@@ -40,5 +40,5 @@ class Scoreboard:
         opponent_text = self.font.render(f"Opponent Score: {self.opponent_score}", True, GlobalSettings.neutral_color)
         surface.blit(opponent_text, (GlobalSettings.WIDTH - 300, 5))
         
-        shipcount_text2 = self.font.render(f"Ship Count: {self.player1.ship_count}/{GlobalSettings.ship_limit}", True, GlobalSettings.neutral_color)
+        shipcount_text2 = self.font.render(f"Ship Count: {self.player2.ship_count}/{GlobalSettings.ship_limit}", True, GlobalSettings.neutral_color)
         surface.blit(shipcount_text2, (GlobalSettings.WIDTH - 300, 50))
