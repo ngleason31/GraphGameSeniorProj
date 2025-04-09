@@ -11,9 +11,6 @@ from Game import runGame
 pygame.init()
 pygame.mixer.init()
 
-CPU_TURN_EVENT = pygame.USEREVENT + 2 # Custom event for CPU turn
-pygame.time.set_timer(CPU_TURN_EVENT, 1000)  # Fire the CPU logic every second
-
 # Load and play the background music
 pygame.mixer.music.load("Audio/gameMusic.mp3")
 pygame.mixer.music.play(-1)

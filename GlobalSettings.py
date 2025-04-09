@@ -21,6 +21,8 @@ red = (255, 0, 0)
 computer1_difficulty = 'Hard'
 computer2_difficulty = 'Hard'
 
+ship_limit = 100
+
 shipcounts = [0, 0]
 
 curr_player = 0

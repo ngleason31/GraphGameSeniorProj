@@ -7,7 +7,7 @@ from collections import deque
 def handle_turn(setting, scoreboard, planets, ships, home_planet, player_num):
                 def cpu_logic():
                     # Auto-spawn CPU ships if enough score
-                    while scoreboard.get_scores()[player_num - 1] >= 250 and GlobalSettings.shipcounts[player_num - 1] < 250:
+                    while scoreboard.get_scores()[player_num - 1] >= 250 and GlobalSettings.shipcounts[player_num - 1] < GlobalSettings.ship_limit:
                         x_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                         y_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
                         ships.append(Ship(home_planet.x + x_offset, home_planet.y + y_offset,

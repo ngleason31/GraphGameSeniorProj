@@ -70,7 +70,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             elif event.type == MOUSEBUTTONDOWN:
                 clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcounts[0] < 250:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcounts[0] < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
