@@ -102,16 +102,16 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                 #Traverses the map in a bfs
                 def bfs():
                     for connection in planets[player.prev_target].connections:
-                        if planets[connection].player_num != player.player_num:
+                        if planets[connection].player_num != player.player_num and connection not in player.bfs:
                             player.bfs.appendleft(connection)
                     player.target_planet = player.bfs.pop()
                     
                 #Traverses the map in a dfs
                 def dfs():
                     for connection in planets[player.prev_target].connections:
-                        if planets[connection].player_num != player.player_num:
-                            player.bfs.append(connection)
-                    player.target_planet = player.bfs.pop()
+                        if planets[connection].player_num != player.player_num and connection not in player.dfs:
+                            player.dfs.append(connection)
+                    player.target_planet = player.dfs.pop()
                 
                 #Moves ship towards its final target planet
                 def ship_logic(ship):
