@@ -18,7 +18,7 @@ blue = (0, 0, 255)
 green = (0, 255, 0)
 red = (255, 0, 0)
 
-ship_limit = 100
+ship_limit = 250
 
 curr_player = 0
 opposing_player = 0

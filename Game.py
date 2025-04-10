@@ -48,9 +48,6 @@ def runGame(screen, player1, player2):
     running = True
     while running:
         
-        #Gets the currently held down keys
-        keys = pygame.key.get_pressed()
-        
         mouse_pos = pygame.mouse.get_pos()
         mouse_x, mouse_y = mouse_pos
         
@@ -63,7 +60,9 @@ def runGame(screen, player1, player2):
                     result = pauseMenu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
                     if result == "home":
                         return "home"
-            elif event.type == MOUSEBUTTONDOWN:
+                    
+            #Only activates mouse clickes if a player is playing
+            elif event.type == MOUSEBUTTONDOWN and player1.settings.lower() == 'player':
                 if event.button == 1:
                     if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
@@ -82,7 +81,7 @@ def runGame(screen, player1, player2):
                         player1.target_planet = clicked_planet.id
                         clicked_planet.selected = True
             
-            # Handle CPU turn event every 3 seconds
+            # Handle CPU turn event according to the difficulty
             elif event.type == TURN_EVENT1:
                 handle_turn(player1.settings, scoreboard, planets, ships, planets[0], player1)
             elif event.type == TURN_EVENT2:
@@ -91,9 +90,10 @@ def runGame(screen, player1, player2):
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
-                
+        
         #Changes color of shop if hovered over
-        shop.is_hovered(mouse_pos)
+        if player1.settings.lower() == 'player':
+            shop.is_hovered(mouse_pos)
                 
         #Use global background setting for the game.
         if GlobalSettings.dark_background:
@@ -223,7 +223,8 @@ def runGame(screen, player1, player2):
                 planet.ship_attacking = False
             
         scoreboard.draw(screen)
-        shop.draw(screen)
+        if player1.settings.lower() == 'player':
+            shop.draw(screen)
      
         pygame.display.update()
         FramePerSec.tick(FPS)
