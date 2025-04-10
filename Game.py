@@ -361,13 +361,12 @@ def pauseMenu(screen, WIDTH, HEIGHT):
 
 
 def checkForWinner(planets):
-    first_owner = planets[0].player_num
-    if first_owner == 0:
+    if planets[0].player_num == 2:
+        return 2
+    elif planets[1].player_num == 1:
+        return 1
+    else:
         return None
-    for planet in planets:
-        if planet.player_num != first_owner:
-            return None
-    return first_owner
 
 def winnerScreen(winner, screen, WIDTH, HEIGHT):
     clock = pygame.time.Clock()
