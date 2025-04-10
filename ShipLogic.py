@@ -100,8 +100,18 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                             best_distance = distance
                 
                 #Traverses the map in a bfs
-                def bfs(ship):
-                    return
+                def bfs():
+                    for connection in planets[player.prev_target].connections:
+                        if planets[connection].player_num != player.player_num:
+                            player.bfs.appendleft(connection)
+                    player.target_planet = player.bfs.pop()
+                    
+                #Traverses the map in a dfs
+                def dfs():
+                    for connection in planets[player.prev_target].connections:
+                        if planets[connection].player_num != player.player_num:
+                            player.bfs.append(connection)
+                    player.target_planet = player.bfs.pop()
                 
                 #Moves ship towards its final target planet
                 def ship_logic(ship):
@@ -135,6 +145,10 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                         highest_scoring_first()
                     elif setting.lower() == 'lowest scoring first':
                         lowest_scoring_first()
+                    elif setting.lower() == 'bfs':
+                        bfs()
+                    elif setting.lower() == 'dfs':
+                        dfs()
                             
                 for ship in ships:
                     if ship.player != player.player_num:

@@ -1,3 +1,4 @@
+from collections import deque
 class Player:
     def __init__(self, player_num, color, home_planet, settings):
         self.player_num = player_num
@@ -8,6 +9,8 @@ class Player:
         self.ship_count = 0
         self.difficulty = 'Hard'
         self.prev_target = home_planet
+        self.bfs = deque()
+        self.dfs = deque()
         
     def change_target(self, new_planet):
         self.target_planet = new_planet
