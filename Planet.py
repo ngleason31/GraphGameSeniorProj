@@ -14,8 +14,9 @@ class Planet:
         self.player_num = player
         self.connections = []
         self.point_value = radius // 5
-        self.max_health = radius * 20
+        self.max_health = health
         self.health = health
+        self.selected = False
         
     def change_player(self, player_num):
         self.player_num = player_num
@@ -28,6 +29,9 @@ class Planet:
             self.health = self.max_health
         
     def draw(self, screen, planets):
+        #Show if it is selected or not
+        if self.selected:
+            pygame.draw.circle(screen, GlobalSettings.green, (int(self.x), int(self.y)), self.radius + 3, width=6)
         #Drawing the planet itself
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius, width=4)
         # Draw the point value on the planet

@@ -17,16 +17,11 @@ FramePerSec = pygame.time.Clock()
 def runGame(screen, player1, player2):
     planets = planet_generator()
     ships = []
-    selected_ships = []
     scoreboard = Scoreboard(player1, player2)
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
     shop = Shop()
-    
-    #init for dragging selection
-    dragging = False
-    dragging_start_pos = (0, 0)
-    dragging_current_pos = (0, 0)
+    clicked_planet = None
     
     # Set a timer to trigger every second (1000 milliseconds)
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
@@ -69,7 +64,6 @@ def runGame(screen, player1, player2):
                     if result == "home":
                         return "home"
             elif event.type == MOUSEBUTTONDOWN:
-                clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                 if event.button == 1:
                     if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
@@ -80,27 +74,13 @@ def runGame(screen, player1, player2):
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
                         player1.update_shipcount(1)
-                    
-                    #Selects a single ship in the hitbox randomly (unless shift is being pressed)
-                    if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
-                        for ship in selected_ships:
-                            ship.is_selected = False
-                        selected_ships = []
-                        
-                    for ship in ships:
-                        if ship.is_clicked(mouse_pos) and ship.player == GlobalSettings.curr_player:
-                            ship.is_selected = True
-                            selected_ships.append(ship)
-                    
-                    #sets up dragging selection 
-                    if not shop.is_clicked(mouse_pos):
-                        dragging = True
-                        dragging_start_pos = event.pos
                 if event.button == 3:
-                    # Movement Logic: Use the clicked planet to set the ship's target.
-                    if clicked_planet is not None:
-                        for ship in selected_ships:
-                            ship.final_target = clicked_planet.id
+                    if clicked_planet:
+                        clicked_planet.selected = False
+                    clicked_planet = planet_loc(mouse_x, mouse_y, planets)
+                    if clicked_planet:
+                        player1.target_planet = clicked_planet.id
+                        clicked_planet.selected = True
             
             # Handle CPU turn event every 3 seconds
             elif event.type == TURN_EVENT1:
@@ -111,20 +91,6 @@ def runGame(screen, player1, player2):
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
-
-            elif event.type == MOUSEBUTTONUP:
-                if event.button == 1:
-                    if dragging:
-                        #Check if any ships are included
-                        x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
-                        width = abs(dragging_current_pos[0] - dragging_start_pos[0])
-                        height = abs(dragging_current_pos[1] - dragging_start_pos[1])
-                        for ship in ships:
-                            if x <= ship.x <= x + width and y <= ship.y <= y + height and ship.player == GlobalSettings.curr_player:
-                                selected_ships.append(ship)
-                                ship.is_selected = True
-                                
-                        dragging = False
                 
         #Changes color of shop if hovered over
         shop.is_hovered(mouse_pos)
@@ -237,7 +203,7 @@ def runGame(screen, player1, player2):
                         target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership
-                        if ship.player == GlobalSettings.curr_player:
+                        if ship.player == player1.player_num:
                             scoreboard.update_player_sps(target_planet.point_value)
                         else:
                             scoreboard.update_opponent_sps(target_planet.point_value)
@@ -258,22 +224,7 @@ def runGame(screen, player1, player2):
             
         scoreboard.draw(screen)
         shop.draw(screen)
-        
-        #Draws and selects the rectangle for selcting ships
-        if dragging:
-            dragging_current_pos = pygame.mouse.get_pos()
-            
-            x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
-            width = abs(dragging_current_pos[0] - dragging_start_pos[0])
-            height = abs(dragging_current_pos[1] - dragging_start_pos[1])
-
-            overlay = pygame.Surface((width, height), pygame.SRCALPHA)
-            overlay.fill((GlobalSettings.neutral_color[0], GlobalSettings.neutral_color[1], GlobalSettings.neutral_color[2], 100))
-
-            screen.blit(overlay, (x, y))
-
-            
-        
+     
         pygame.display.update()
         FramePerSec.tick(FPS)
 

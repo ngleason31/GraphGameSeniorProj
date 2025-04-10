@@ -14,8 +14,6 @@ class Ship:
         self.curr_planet = curr_planet
         self.next_planet = curr_planet
         self.curr_target = self.pos
-        self.final_target = None
-        self.is_selected = False
         self.max_health = 20
         self.health = 20
         self.landed = True
@@ -23,8 +21,6 @@ class Ship:
         
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
-        if self.is_selected:
-            pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=5)
         pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=3)
 
         #if self.health != self.max_health:
@@ -58,9 +54,6 @@ class Ship:
         y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)
         self.landed = False
-    
-    def set_final_target(self, planet):
-        self.final_target = planet.id
 
     def update_position(self):
         if self.pos != self.curr_target:

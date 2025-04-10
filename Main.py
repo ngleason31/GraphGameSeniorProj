@@ -27,8 +27,8 @@ screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 
-player1 = Player(1, GlobalSettings.orange, 0, 0, 'player')
-player2 = Player(2, GlobalSettings.blue, 1, 1, 'player')
+player1 = Player(1, GlobalSettings.orange, 0, None, 'player')
+player2 = Player(2, GlobalSettings.blue, 1, None, 'player')
 
 def main(): 
     running = True

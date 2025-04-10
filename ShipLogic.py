@@ -20,8 +20,8 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                         
                 #Finds the higest adjacent planet and moves to it
                 def best_move_first(ship):
-                    if ship.curr_planet != player.target_planet and planets[player.target_planet].player_num != player.player_num:
-                        ship.set_target(planets[next_step(ship.curr_planet, player.target_planet, planets)])
+                    if player.target_planet != None:
+                        return None
                     else:
                         best_value = -1
                         adjacent_planets = [planets[i] for i in planets[ship.curr_planet].connections]
@@ -151,11 +151,18 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                 
                 #Moves ship towards its final target planet
                 def ship_logic(ship):
-                    if ship.final_target == None or ship.final_target == ship.curr_planet:
-                        ship.final_target = None
+                    #Find new target planet
+                    if (player.target_planet == None or 
+                    (player.target_planet == ship.curr_planet and planets[ship.curr_planet].player_num == player.player_num)):
+                        player.target_planet = None
                         return
-                    next_step_id = next_step(ship.curr_planet, ship.final_target, planets)
-                    ship.set_target(planets[next_step_id])
+                    #Capture target_planet and do nothing
+                    elif player.target_planet == ship.curr_planet and planets[ship.curr_planet].player_num != player.player_num:
+                        return
+                    else:
+                        #Step towards target planet
+                        next_step_id = next_step(ship.curr_planet, player.target_planet, planets)
+                        ship.set_target(planets[next_step_id])
 
                 #Checks if the logic is a human or cpu player
                 if setting != 'player':
@@ -167,11 +174,6 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                         continue  # only manage CPU ships
 
                     current_planet = planets[ship.curr_planet]
-
-                    #If physically on a planet that isn't owned yet, skip movement (still capturing), or if it has not and is AI
-                    distance = math.hypot(ship.x - current_planet.x, ship.y - current_planet.y)
-                    if distance < current_planet.radius and current_planet.player_num != player.player_num:
-                        continue
                     
                     if setting.lower() == 'best move first':
                         best_move_first(ship)  
