@@ -20,33 +20,30 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                         
                 #Finds the higest adjacent planet and moves to it
                 def best_move_first(ship):
-                    best_value = -1
-                    best_next_step_id = None
-
-                    adjacent_planets = [planets[i] for i in planets[ship.curr_planet].connections]
-                    candidate_planets = [p for p in adjacent_planets if p.player_num != player.player_num]
-                    
-                    #If all planets nearby have been conquered, BFS for the next planet nearby
-                    if not candidate_planets:
-                        planet_deque = deque(adjacent_planets)
-                        while planet_deque:
-                            planet = planet_deque.pop()
-                            if planet.player_num != player.player_num:
-                                best_next_step_id = next_step(ship.curr_planet, planet.id, planets)
-                                break
-                            else:
-                                adjacent_planets = [planets[i] for i in planet.connections]
-                                for adjacent_planet in adjacent_planets:
-                                    planet_deque.appendleft(adjacent_planet)
+                    if ship.curr_planet != player.target_planet and planets[player.target_planet].player_num != player.player_num:
+                        ship.set_target(planets[next_step(ship.curr_planet, player.target_planet, planets)])
                     else:
-                        for candidate_planet in candidate_planets:
-                            if candidate_planet.point_value > best_value:
-                                best_next_step_id = candidate_planet.id
-                                best_value = candidate_planet.point_value
-                    #If we found a reachable planet, move one hop toward it
-                    if best_next_step_id is not None:
-                    # next_step_id is the planet ID of the next immediate planet in the BFS path
-                        ship.set_target(planets[best_next_step_id])
+                        best_value = -1
+                        adjacent_planets = [planets[i] for i in planets[ship.curr_planet].connections]
+                        candidate_planets = [p for p in adjacent_planets if p.player_num != player.player_num]
+                    
+                        #If all planets nearby have been conquered, BFS for the next planet nearby
+                        if not candidate_planets:
+                            planet_deque = deque(adjacent_planets)
+                            while planet_deque:
+                                planet = planet_deque.pop()
+                                if planet.player_num != player.player_num:
+                                    player.target_planet = planet.id
+                                    break
+                                else:
+                                    adjacent_planets = [planets[i] for i in planet.connections]
+                                    for adjacent_planet in adjacent_planets:
+                                        planet_deque.appendleft(adjacent_planet)
+                        else:
+                            for candidate_planet in candidate_planets:
+                                if candidate_planet.point_value > best_value:
+                                    player.target_planet = candidate_planet.id
+                                    best_value = candidate_planet.point_value
                         
                 #Finds the lowest adjacent planet and moves to it
                 def worst_move_first(ship):

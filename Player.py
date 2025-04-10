@@ -12,7 +12,7 @@ class Player:
         self.target_planet = new_planet
 
     def change_difficulty(self, new_difficulty):
-        self.target_planet = new_difficulty
+        self.difficulty = new_difficulty
         
     def change_setting(self, new_setting):
         self.settings = new_setting
