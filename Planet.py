@@ -4,7 +4,7 @@ import GlobalSettings
 import random
 
 class Planet:
-    def __init__(self, id, x, y, radius=60, player=0):
+    def __init__(self, id, x, y, radius=60, player=0, health=1200):
         self.id = id
         self.x = x
         self.y = y
@@ -15,7 +15,7 @@ class Planet:
         self.connections = []
         self.point_value = radius // 5
         self.max_health = radius * 20
-        self.health = radius * 20
+        self.health = health
         
     def change_player(self, player_num):
         self.player_num = player_num
@@ -75,8 +75,8 @@ class Planet:
         
 def planet_generator():
     #Start with a top left, center, and bottom left planet
-    player_planet = Planet(0, 150, 150, 30, GlobalSettings.curr_player)
-    opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 30, GlobalSettings.opposing_player)
+    player_planet = Planet(0, 150, 150, 30, GlobalSettings.curr_player, health=10000)
+    opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 30, GlobalSettings.opposing_player, health=10000)
     
     planets = [player_planet, opposing_planet]
     num_planets = random.randint(80, 90) + 2
