@@ -2,8 +2,7 @@ import pygame
 import random
 import sys
 import math
-from Planet import planet_generator, planet_loc
-from Player import Player
+from Planet import planet_generator, planet_loc 
 from ShipLogic import handle_turn
 from Scoreboard import Scoreboard
 from Ship import Ship

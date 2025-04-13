@@ -77,6 +77,31 @@ class Planet:
         fill_width = (self.health / self.max_health) * (bar_width - 2)
         pygame.draw.rect(screen, GlobalSettings.red, (bar_x+1, bar_y+1, fill_width, bar_height-2))
         
+    def serialize(self):
+        return {
+            "id": self.id,
+            "x": self.x,
+            "y": self.y,
+            "radius": self.radius,
+            "ship_attacking": self.ship_attacking,
+            "color": self.color,
+            "player_num": self.player_num,
+            "connections": self.connections,
+            "point_value": self.point_value,
+            "max_health": self.max_health,
+            "health": self.health,
+        }
+
+    @staticmethod
+    def deserialize(data):
+        p = Planet(data["id"], data["x"], data["y"], data["radius"], data["player_num"], data["max_health"])
+        p.ship_attacking = data["ship_attacking"]
+        p.color = data["color"]
+        p.connections = data["connections"]
+        p.point_value = data["point_value"]
+        p.health = data["health"]
+        return p
+            
 def planet_generator():
     #Start with a top left, center, and bottom left planet
     player_planet = Planet(0, 150, 150, 30, GlobalSettings.curr_player, health=10000)
