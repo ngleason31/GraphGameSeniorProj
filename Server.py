@@ -5,54 +5,52 @@ from Game import runGame
 from Player import Player
 import GlobalSettings
 
-HOST = '0.0.0.0'
-PORT = 5555
+def server(player1, player2):
+    HOST = '0.0.0.0'
+    PORT = 5555
 
-clients = []
-inputs = [None, None]
+    clients = []
+    inputs = [None, None]
 
-player1 = Player(1, GlobalSettings.orange, 0, 'player')
-player2 = Player(2, GlobalSettings.blue, 1, 'player')
-
-def client_handler(conn, player_id):
-    while True:
-        try:
-            data = conn.recv(8192)
-            if not data:
+    def client_handler(conn, player_id):
+        while True:
+            try:
+                data = conn.recv(8192)
+                if not data:
+                    break
+                inputs[player_id] = pickle.loads(data)
+            except Exception as e:
+                print(f"[ERROR] Player {player_id+1} disconnected: {e}")
                 break
-            inputs[player_id] = pickle.loads(data)
+        conn.close()
+
+    def broadcast_game_state(game_state):
+        try:
+            data = pickle.dumps(game_state.to_dict())
+            for client in clients:
+                client.sendall(data)
         except Exception as e:
-            print(f"[ERROR] Player {player_id+1} disconnected: {e}")
-            break
-    conn.close()
-
-def broadcast_game_state(game_state):
-    try:
-        data = pickle.dumps(game_state.to_dict())
-        for client in clients:
-            client.sendall(data)
-    except Exception as e:
-        print(f"[ERROR] Failed to broadcast: {e}")
+            print(f"[ERROR] Failed to broadcast: {e}")
 
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((HOST, PORT))
-server.listen(2)
-print("[SERVER] Waiting for clients to connect...")
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST, PORT))
+    server.listen(2)
+    print("[SERVER] Waiting for clients to connect...")
 
-for i in range(2):
-    conn, addr = server.accept()
-    print(f"[SERVER] Player {i+1} connected from {addr}")
-    clients.append(conn)
-    threading.Thread(target=client_handler, args=(conn, i)).start()
+    for i in range(2):
+        conn, addr = server.accept()
+        print(f"[SERVER] Player {i+1} connected from {addr}")
+        clients.append(conn)
+        threading.Thread(target=client_handler, args=(conn, i)).start()
 
-runGame(
-    screen=None,
-    player1=player1,
-    player2=player2,
-    server_mode=True,
-    inputs=inputs,
-    broadcast=broadcast_game_state
-)
+    runGame(
+        screen=None,
+        player1=player1,
+        player2=player2,
+        server_mode=True,
+        inputs=inputs,
+        broadcast=broadcast_game_state
+    )
 
-server.close()
+    server.close()

@@ -70,6 +70,10 @@ def selection_screen(screen, width, height, mode, player1, player2):
     return_button_rect = pygame.Rect(width // 2 - 100, height - 200, 200, 50)
     continue_button_rect = pygame.Rect(width // 2 - 100 , height - 300, 200, 50)
     
+    #Host button definitions
+    host_button_rect = pygame.Rect(width // 2 - 100, height - 500, 200, 50)
+    join_button_rect = pygame.Rect(width // 2 - 100 , height - 400, 200, 50)
+    
     #Selection definitions
     player1_rect = pygame.Rect(width // 2 - 600, 200, 400, 100)
     player1_box = pygame.Rect(width // 2 - 560, 215, 70, 70)
@@ -163,6 +167,17 @@ def selection_screen(screen, width, height, mode, player1, player2):
 
                             
             if mode.lower() == 'multiplayer':
+                
+                if host_button_rect.collidepoint(mouse):
+                    pygame.draw.rect(screen, GlobalSettings.black, host_button_rect)
+                else:
+                    pygame.draw.rect(screen, GlobalSettings.gray, host_button_rect)
+
+                if join_button_rect.collidepoint(mouse):
+                    pygame.draw.rect(screen, GlobalSettings.black, join_button_rect)
+                else:
+                    pygame.draw.rect(screen, GlobalSettings.gray, join_button_rect)
+                    
                 player1_text_surface = font.render("Player 1", True, (255, 255, 255))
                 player1_text_rect = player1_text_surface.get_rect(center=player1_rect.center)
                 screen.blit(player1_text_surface, player1_text_rect)
@@ -170,6 +185,14 @@ def selection_screen(screen, width, height, mode, player1, player2):
                 player2_text_surface = font.render("Player 2", True, (255, 255, 255))
                 player2_text_rect = player1_text_surface.get_rect(center=player2_rect.center)
                 screen.blit(player2_text_surface, player2_text_rect)
+                
+                host_text_surface = font.render("Host Game", True, (255, 255, 255))
+                host_text_rect = host_text_surface.get_rect(center=host_button_rect.center)
+                screen.blit(host_text_surface, host_text_rect)
+                
+                join_text_surface = font.render("Join Game", True, (255, 255, 255))
+                join_text_rect = join_text_surface.get_rect(center=join_button_rect.center)
+                screen.blit(join_text_surface, join_text_rect)
                 
             if mode.lower() == 'computer':
                 computer1_surface = font.render("Computer 1", True, (255, 255, 255))
