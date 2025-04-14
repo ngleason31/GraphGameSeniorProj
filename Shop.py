@@ -2,9 +2,10 @@ import pygame
 import GlobalSettings
 
 class Shop:
-    def __init__(self):
+    def __init__(self, triangle_color=GlobalSettings.orange):
         self.rect = pygame.Rect(GlobalSettings.WIDTH / 2 - 25, 30, 50, 50)
         self.color = GlobalSettings.gray
+        self.triangle_color = triangle_color
         
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
@@ -14,7 +15,7 @@ class Shop:
             (self.rect.x + 15, self.rect.bottom - 10),
             (self.rect.right - 15, self.rect.bottom - 10)
         ]
-        pygame.draw.polygon(screen, GlobalSettings.player_colors[GlobalSettings.curr_player], triangle_points, width=4)
+        pygame.draw.polygon(screen, self.triangle_color, triangle_points, width=4)
         
         font = pygame.font.Font(None, 25)
         text_surface = font.render("250", True, (255, 255, 255))

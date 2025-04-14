@@ -101,7 +101,10 @@ def selection_screen(screen, width, height, mode, player1, player2):
                 mouse = pygame.mouse.get_pos()
                 if return_button_rect.collidepoint(mouse):
                         return ['home', None, None]
-                
+                if host_button_rect.collidepoint(mouse) and mode.lower() == 'multiplayer':
+                        return ['server', 'player', 'player']
+                if join_button_rect.collidepoint(mouse) and mode.lower() == 'multiplayer':
+                        return ['client', 'player', 'player']
                 if continue_button_rect.collidepoint(mouse):
                         if mode.lower() == 'single player':
                             return ['game', 'player', dropdown_menu2.options[dropdown_menu2.selected_index]]

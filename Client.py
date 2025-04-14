@@ -1,39 +1,49 @@
 import socket
 import pickle
 import pygame
+from Shop import Shop
+from Planet import planet_loc
 import GlobalSettings
 
-def client():
+def client(screen, player1, player2):
     HOST = 'SERVER_IP_HERE'
     PORT = 5555
 
     pygame.init()
-    screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
     clock = pygame.time.Clock()
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((HOST, PORT))
 
     running = True
+    shop = Shop(triangle_color=GlobalSettings.blue)
+    clicked_planet = None
 
     while running:
         pygame.event.pump()
         input_data = {}
+        mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                input_data = {
-                    "type": "click",
-                    "button": event.button,
-                    "pos": pygame.mouse.get_pos()
-                }
-            elif event.type == pygame.KEYDOWN:
-                input_data = {
-                    "type": "key",
-                    "key": event.key
-                }
+                if event.button == 1:
+                    if shop.is_clicked(mouse_pos):
+                        input_data = {
+                            "type": "buy_ship"
+                        }
+                if event.button == 3:
+                    if clicked_planet:
+                        clicked_planet.selected = False
+                        clicked_planet = planet_loc(mouse_pos.x, mouse_pos.y, planets)
+                    if clicked_planet:
+                        player2.target_planet = clicked_planet.id
+                        clicked_planet.selected = True
+                        input_data = {
+                            "type": "select_planet",
+                            "planet_id": clicked_planet.id
+                        }
 
         try:
             client.sendall(pickle.dumps(input_data))
@@ -57,6 +67,9 @@ def client():
                 ship.draw(screen)
                 
             scoreboard.draw(screen)
+            shop.is_hovered(mouse_pos)
+            shop.draw(screen)
+            
 
             pygame.display.flip()
             clock.tick(60)
