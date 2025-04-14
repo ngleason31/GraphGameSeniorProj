@@ -9,6 +9,8 @@ class Scoreboard:
         self.player_sps = 0
         self.opponent_sps = 0
         self.opponent_score = 1000
+        self.player1_shipcount = 0
+        self.player2_shipcount = 0
         self.font = pygame.font.Font(None, 36)
         
     def update(self):
