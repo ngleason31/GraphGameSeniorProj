@@ -99,19 +99,55 @@ def selection_screen(screen, width, height, mode, player1, player2):
             #Handle button presses
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
+                
+                # Return to home if that button is pressed.
                 if return_button_rect.collidepoint(mouse):
-                        return ['home', None, None]
-                if host_button_rect.collidepoint(mouse) and mode.lower() == 'multiplayer':
-                        return ['server', 'player', 'player']
-                if join_button_rect.collidepoint(mouse) and mode.lower() == 'multiplayer':
-                        return ['client', 'player', 'player']
+                    return ['home', None, None]
+                
+                # Multiplayer mode handling.
+                if mode.lower() == 'multiplayer':
+                    # Host option: prompt for IP to bind to.
+                    if host_button_rect.collidepoint(mouse):
+                        from NetworkUtils import get_ip_input
+                        host_ip = get_ip_input(screen, prompt="Enter IP to bind to: ", font=font)
+                        return ['server', 'player', 'player', host_ip]
+                    
+                    # Join option: show local IP
+                    if join_button_rect.collidepoint(mouse):
+                        from NetworkUtils import get_local_ip
+                        local_ip = get_local_ip()
+                        
+                        # Display the local IP on the screen and wait for the user to return to the home screen.
+                        showing_ip = True
+                        while showing_ip:
+                            screen.fill(GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg)
+                            ip_display = font.render(f"Your IP: {local_ip}", True, (255, 255, 255))
+                            screen.blit(ip_display, (20, 20))
+                            
+                            # Draw a "Return to Home" button
+                            return_button_rect = pygame.Rect(width // 2 - 100, height - 200, 200, 50)
+                            draw_shaded_button(screen, return_button_rect, "Return to Home", font)
+                            
+                            pygame.display.flip()
+                            
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    return ["home", None, None]
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    if return_button_rect.collidepoint(event.pos):
+                                        showing_ip = False  # Exit the loop and return to the home screen
+
+                        return ["home", None, None]
+
+                
+                # Non-multiplayer (or additional) handling.
                 if continue_button_rect.collidepoint(mouse):
-                        if mode.lower() == 'single player':
-                            return ['game', 'player', dropdown_menu2.options[dropdown_menu2.selected_index]]
-                        if mode.lower() == 'computer':
-                            return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
-                        else:
-                            return ['game', 'player', 'player']
+                    if mode.lower() == 'single player':
+                        return ['game', 'player', dropdown_menu2.options[dropdown_menu2.selected_index]]
+                    if mode.lower() == 'computer':
+                        return ['game', dropdown_menu1.options[dropdown_menu1.selected_index], dropdown_menu2.options[dropdown_menu2.selected_index]]
+                    else:
+                        return ['game', 'player', 'player']
                                     
                     
             # Use the global background setting for the color.
@@ -170,6 +206,24 @@ def selection_screen(screen, width, height, mode, player1, player2):
 
                             
             if mode.lower() == 'multiplayer':
+                # Host button pressed: prompt for IP to bind to.
+                if host_button_rect.collidepoint(mouse):
+                    from NetworkUtils import get_ip_input
+                    host_ip = get_ip_input(screen, prompt="Enter IP to bind to: ", font=font)
+                    return ['server', 'player', 'player', host_ip]
+                # Join button pressed: show local IP then prompt for server IP.
+                if join_button_rect.collidepoint(mouse):
+                    from NetworkUtils import get_local_ip, get_ip_input
+                    local_ip = get_local_ip()
+                    # Display the local IP on the screen briefly.
+                    screen.fill(GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg)
+                    ip_display = font.render(f"Your IP: {local_ip}", True, (255, 255, 255))
+                    screen.blit(ip_display, (20, 20))
+                    pygame.display.flip()
+                    pygame.time.wait(2000)
+                    # Now prompt the user to enter the server IP to join.
+                    server_ip = get_ip_input(screen, prompt="Enter server IP to join: ", font=font)
+                    return ['client', 'player', 'player', server_ip]
                 
                 if host_button_rect.collidepoint(mouse):
                     pygame.draw.rect(screen, GlobalSettings.black, host_button_rect)

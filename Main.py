@@ -60,14 +60,16 @@ def main():
             if res[0] != "home" and res[0].lower() == "server":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
-                res = server(screen, player1, player2)
-                if res == "quit":
+                # Pass the entered host IP (res[3]) to the server function.
+                res_server = server(screen, player1, player2, res[3])
+                if res_server == "quit":
                     running = False
             if res[0] != "home" and res[0].lower() == "client":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
-                res = client(screen, player1, player2)
-                if res == "quit":
+                print("Your local IP is:", res[3])
+                res_client = client(screen, player1, player2, res[3])
+                if res_client == "quit":
                     running = False
         elif option.lower() in "computer":
             GlobalSettings.curr_player = 1
