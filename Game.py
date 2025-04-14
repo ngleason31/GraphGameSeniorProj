@@ -1,5 +1,6 @@
 import pygame
 import random
+import pickle
 import sys
 import math
 from Planet import planet_generator, planet_loc 
@@ -13,7 +14,7 @@ import GlobalSettings
 FPS = 60
 FramePerSec = pygame.time.Clock()
 
-def runGame(screen, player1, player2):
+def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=None):
     planets = planet_generator()
     ships = []
     scoreboard = Scoreboard(player1, player2)
@@ -63,7 +64,7 @@ def runGame(screen, player1, player2):
             #Only activates mouse clickes if a player is playing
             elif event.type == MOUSEBUTTONDOWN and player1.settings.lower() == 'player':
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and player1.ship_count < GlobalSettings.ship_limit:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and scoreboard.player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
@@ -71,7 +72,7 @@ def runGame(screen, player1, player2):
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
-                        player1.update_shipcount(1)
+                        scoreboard.player1.ship_count += 1
                 if event.button == 3:
                     if clicked_planet:
                         clicked_planet.selected = False
@@ -181,9 +182,9 @@ def runGame(screen, player1, player2):
                     ship_list.remove(s)
                     ships.remove(s)
                     if s.player == 1:
-                        player1.update_shipcount(-1)
+                        scoreboard.player1.ship_count -= 1
                     if s.player == 2:
-                        player2.update_shipcount(-1)
+                        scoreboard.player2.ship_count -= 1
 
 
         # Capture Logic: Check if any ship has reached its target planet.
@@ -220,6 +221,39 @@ def runGame(screen, player1, player2):
             
             if not has_ship_attacking:
                 planet.ship_attacking = False
+        
+        # Handles server stuff
+        if server_mode:
+            # Broadcast the game state to all clients
+            game_state = {
+                'planets': [planet.to_dict() for planet in planets],
+                'ships': [ship.to_dict() for ship in ships],
+                'scoreboard': scoreboard.get_scores()
+            }
+            broadcast(game_state)
+            
+            try:
+                data = b""
+                while True:
+                    part = server.recv(8192)
+                    data += part
+                    if len(part) < 8192:
+                        break
+                action = pickle.loads(data)
+                if action["type"] == "buy_ship":
+                    #Buys a ship at opponenets planet
+                    x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    x = planets[1].x + x_offset
+                    y = planets[1].y + y_offset
+                    ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
+                    scoreboard.update_opponent(-250)
+                    scoreboard.player2.ship_count += 1
+                if action["type"] == "select_planet":
+                    player2.target_planet = action["planet_id"]
+            except Exception as e:
+                print("[CLIENT] Disconnected from server:", e)
+                running = False
             
         scoreboard.draw(screen)
         if player1.settings.lower() == 'player':

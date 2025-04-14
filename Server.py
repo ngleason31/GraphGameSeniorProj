@@ -2,10 +2,8 @@ import socket
 import threading
 import pickle
 from Game import runGame
-from Player import Player
-import GlobalSettings
 
-def server(player1, player2):
+def server(screen, player1, player2):
     HOST = '0.0.0.0'
     PORT = 5555
 
@@ -45,12 +43,12 @@ def server(player1, player2):
         threading.Thread(target=client_handler, args=(conn, i)).start()
 
     runGame(
-        screen=None,
+        screen=screen,
         player1=player1,
         player2=player2,
         server_mode=True,
-        inputs=inputs,
-        broadcast=broadcast_game_state
+        broadcast=broadcast_game_state,
+        server=server
     )
 
     server.close()
