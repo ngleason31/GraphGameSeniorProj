@@ -8,7 +8,8 @@ import GlobalSettings
 from SelectionScreen import selection_screen
 from Game import runGame
 from Player import Player
-
+from Server import server
+from Client import client
 pygame.init()
 pygame.mixer.init()
 
@@ -56,10 +57,16 @@ def main():
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
-            if res[0] != "home":
+            if res[0] != "home" and res[0].lower() == "server":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
-                res = runGame(screen, player1, player2)
+                res = server(screen, player1, player2)
+                if res == "quit":
+                    running = False
+            if res[0] != "home" and res[0].lower() == "client":
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = client(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() in "computer":
