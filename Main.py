@@ -57,14 +57,17 @@ def main():
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
-            if res[0] != "home" and res[0].lower() == "server":
+            if res[0] == "multiplayer_menu":
+                option = "multiplayer" 
+                continue
+            elif res[0] != "home" and res[0].lower() == "server":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
                 # Pass the entered host IP (res[3]) to the server function.
                 res_server = server(screen, player1, player2, res[3])
                 if res_server == "quit":
                     running = False
-            if res[0] != "home" and res[0].lower() == "client":
+            elif res[0] != "home" and res[0].lower() == "client":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
                 print("Your local IP is:", res[3])

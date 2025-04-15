@@ -5,19 +5,26 @@ from Shop import Shop
 from Planet import planet_loc
 import GlobalSettings
 
-def client(screen, player1, player2):
-    HOST = 'SERVER_IP_HERE'
+def client(screen, player1, player2, server_ip):
+    HOST = server_ip 
     PORT = 5555
 
     pygame.init()
     clock = pygame.time.Clock()
 
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((HOST, PORT))
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #client.connect((HOST, PORT))
+    try:
+        client_socket.connect((HOST, PORT))
+    except Exception as e:
+        print("[CLIENT] Unable to connect to server:", e)
+        return
+    
 
     running = True
     shop = Shop(triangle_color=GlobalSettings.blue)
     clicked_planet = None
+    planets = []  # Initial empty list for planets (will be updated from game state)
 
     while running:
         pygame.event.pump()
@@ -56,7 +63,7 @@ def client(screen, player1, player2):
             game_state_dict = pickle.loads(data)
             planets = game_state_dict["planets"]
             ships = game_state_dict["ships"]
-            scoreboard = game_state_dict["scoreboard"]
+            scoreboard = game_state_dict["scoreboard", None]
 
             # DRAW game_state
             screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
