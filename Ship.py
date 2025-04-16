@@ -14,7 +14,6 @@ class Ship:
         self.curr_planet = curr_planet
         self.next_planet = curr_planet
         self.curr_target = self.pos
-        self.is_selected = False
         self.max_health = 20
         self.health = 20
         self.landed = True
@@ -22,29 +21,10 @@ class Ship:
         
     def draw(self, screen):
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
-        if self.is_selected:
-            pygame.draw.polygon(screen, GlobalSettings.neutral_color, triangle_points, width=5)
         pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=3)
 
-        if self.health != self.max_health:
-            self.draw_health_bar(screen)
-
-    def draw_health_bar(self, screen):
-        #Draws a small health bar above the ship.
-        bar_width = 30
-        bar_height = 5
-        offset_y = 15  
-
-        # position the bar above the ship
-        bar_x = self.x - bar_width // 2
-        bar_y = self.y - self.size - offset_y
-
-        # outline
-        pygame.draw.rect(screen, GlobalSettings.neutral_color, (bar_x, bar_y, bar_width, bar_height), 1)
-        # fill
-        fill_width = (self.health / self.max_health) * (bar_width - 2)
-        pygame.draw.rect(screen, GlobalSettings.red, (bar_x+1, bar_y+1, fill_width, bar_height-2))
-
+        #if self.health != self.max_health:
+            #self.draw_health_bar(screen)
     
     def get_position(self):
         return (self.x, self.y)
@@ -57,7 +37,7 @@ class Ship:
         y = planet.y + y_offset
         self.curr_target = pygame.Vector2(x, y)
         self.landed = False
-    
+
     def update_position(self):
         if self.pos != self.curr_target:
             direction = (self.curr_target - self.pos).normalize()
@@ -75,8 +55,26 @@ class Ship:
             self.landed = True
             self.curr_planet = self.next_planet
         
-    def is_clicked(self, pos):
-        if pos[0] <= self.x + self.size and pos[0] >= self.x - self.size and pos[1] >= self.y - self.size and pos[1] <= self.y + self.size:
-            return True
-        else:
-            return False
+    def serialize(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "player": self.player,
+            "size": self.size,
+            "speed": self.speed,
+            "curr_planet": self.curr_planet,
+            "next_planet": self.next_planet,
+            "curr_target": self.curr_target,
+            "max_health": self.max_health,
+            "health": self.health,
+            "landed": self.landed,
+        }
+
+    @staticmethod
+    def deserialize(data):
+        s = Ship(data["x"], data["y"], data["curr_planet"], data["player"], data["size"], data["speed"])
+        s.next_planet = data["next_planet"]
+        s.curr_target = data["curr_target"]
+        s.health = data["health"]
+        s.landed = data["landed"]
+        return s

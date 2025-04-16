@@ -1,8 +1,9 @@
 import pygame
 
 #Global Variables
-audio_on = False    
+audio_on = False  
 dark_background = True 
+volume = 1.0
 
 WIDTH = 0
 HEIGHT = 0
@@ -17,10 +18,7 @@ blue = (0, 0, 255)
 green = (0, 255, 0)
 red = (255, 0, 0)
 
-computer1_difficulty = 'Medium'
-computer2_difficulty = 'Medium'
-
-shipcounts = [0, 0]
+ship_limit = 2000
 
 curr_player = 0
 opposing_player = 0

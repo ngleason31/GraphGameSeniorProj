@@ -1,9 +1,10 @@
 import pygame
 import random
+import pickle
 import sys
 import math
-from Planet import planet_generator, planet_loc
-from CpuLogic import handle_cpu_turn
+from Planet import planet_generator, planet_loc 
+from ShipLogic import handle_turn
 from Scoreboard import Scoreboard
 from Ship import Ship
 from Shop import Shop
@@ -13,47 +14,39 @@ import GlobalSettings
 FPS = 60
 FramePerSec = pygame.time.Clock()
 
-def runGame(screen, cpu1_setting, cpu2_setting):
+def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=None):
     planets = planet_generator()
     ships = []
-    selected_ships = []
-    scoreboard = Scoreboard()
+    scoreboard = Scoreboard(player1, player2)
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
     shop = Shop()
-    
-    #init for dragging selection
-    dragging = False
-    dragging_start_pos = (0, 0)
-    dragging_current_pos = (0, 0)
+    clicked_planet = None
     
     # Set a timer to trigger every second (1000 milliseconds)
     SCORE_UPDATE_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SCORE_UPDATE_EVENT, 1000)
 
-    CPU1_TURN_EVENT = pygame.USEREVENT + 2
-    CPU2_TURN_EVENT = pygame.USEREVENT + 3
+    TURN_EVENT1 = pygame.USEREVENT + 2
+    TURN_EVENT2 = pygame.USEREVENT + 3
     
-    if GlobalSettings.computer1_difficulty.lower() == 'easy':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 3000)
-    elif GlobalSettings.computer1_difficulty.lower() == 'medium':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 1000)
-    elif GlobalSettings.computer1_difficulty.lower() == 'hard':
-        pygame.time.set_timer(CPU1_TURN_EVENT, 250)
+    if player1.difficulty.lower() == 'easy':
+        pygame.time.set_timer(TURN_EVENT1, 3000)
+    elif player1.difficulty.lower() == 'medium':
+        pygame.time.set_timer(TURN_EVENT1, 1000)
+    elif player1.difficulty.lower() == 'hard':
+        pygame.time.set_timer(TURN_EVENT1, 250)
         
-    if GlobalSettings.computer2_difficulty.lower() == 'easy':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 3000)
-    elif GlobalSettings.computer2_difficulty.lower() == 'medium':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 1000)
-    elif GlobalSettings.computer2_difficulty.lower() == 'hard':
-        pygame.time.set_timer(CPU2_TURN_EVENT, 250)
+    if player2.difficulty.lower() == 'easy':
+        pygame.time.set_timer(TURN_EVENT2, 3000)
+    elif player2.difficulty.lower() == 'medium':
+        pygame.time.set_timer(TURN_EVENT2, 1000)
+    elif player2.difficulty.lower() == 'hard':
+        pygame.time.set_timer(TURN_EVENT2, 250)
 
 
     running = True
     while running:
-        
-        #Gets the currently held down keys
-        keys = pygame.key.get_pressed()
         
         mouse_pos = pygame.mouse.get_pos()
         mouse_x, mouse_y = mouse_pos
@@ -67,10 +60,11 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                     result = pauseMenu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
                     if result == "home":
                         return "home"
-            elif event.type == MOUSEBUTTONDOWN:
-                clicked_planet = planet_loc(mouse_x, mouse_y, planets)
+                    
+            #Only activates mouse clickes if a player is playing
+            elif event.type == MOUSEBUTTONDOWN and player1.settings.lower() == 'player':
                 if event.button == 1:
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and GlobalSettings.shipcount[0] < 250:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and scoreboard.player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
@@ -78,62 +72,28 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
                         scoreboard.update_player(-250)
-                        GlobalSettings.shipcount[0] += 1
-                    
-                    #Selects a single ship in the hitbox randomly (unless shift is being pressed)
-                    if (not keys[pygame.K_LSHIFT] and not keys[pygame.K_RSHIFT]) or shop.is_clicked(mouse_pos):
-                        for ship in selected_ships:
-                            ship.is_selected = False
-                        selected_ships = []
-                        
-                    for ship in ships:
-                        if ship.is_clicked(mouse_pos) and ship.player == GlobalSettings.curr_player:
-                            ship.is_selected = True
-                            selected_ships.append(ship)
-                    
-                    #sets up dragging selection 
-                    if not shop.is_clicked(mouse_pos):
-                        dragging = True
-                        dragging_start_pos = event.pos
+                        scoreboard.player1.ship_count += 1
                 if event.button == 3:
-                    # Movement Logic: Use the clicked planet to set the ship's target.
-                    if clicked_planet is not None:
-                        for ship in selected_ships:
-                            current_planet = planets[ship.curr_planet]
-                            # Check if the clicked planet is connected to the ship's current planet.
-                            if clicked_planet.id in current_planet.connections:
-                                ship.set_target(clicked_planet)
+                    if clicked_planet:
+                        clicked_planet.selected = False
+                    clicked_planet = planet_loc(mouse_x, mouse_y, planets)
+                    if clicked_planet:
+                        player1.target_planet = clicked_planet.id
+                        clicked_planet.selected = True
             
-            # Handle CPU turn event every 3 seconds
-            elif event.type == CPU1_TURN_EVENT:
-                if cpu1_setting != None:
-                    #Handles first cpu turn
-                    handle_cpu_turn(cpu1_setting, scoreboard, planets, ships, planets[0], GlobalSettings.curr_player)
-            elif event.type == CPU2_TURN_EVENT:
-                if cpu2_setting != None:
-                    #Handles second cpu turn
-                    handle_cpu_turn(cpu2_setting, scoreboard, planets, ships, planets[1], GlobalSettings.opposing_player)
+            # Handle CPU turn event according to the difficulty
+            elif event.type == TURN_EVENT1:
+                handle_turn(player1.settings, scoreboard, planets, ships, planets[0], player1)
+            elif event.type == TURN_EVENT2:
+                handle_turn(player2.settings, scoreboard, planets, ships, planets[1], player2)
                         
             # Handle scoreboard update event every second
             elif event.type == SCORE_UPDATE_EVENT:
                 scoreboard.update()
-
-            elif event.type == MOUSEBUTTONUP:
-                if event.button == 1:
-                    if dragging:
-                        #Check if any ships are included
-                        x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
-                        width = abs(dragging_current_pos[0] - dragging_start_pos[0])
-                        height = abs(dragging_current_pos[1] - dragging_start_pos[1])
-                        for ship in ships:
-                            if x <= ship.x <= x + width and y <= ship.y <= y + height and ship.player == GlobalSettings.curr_player:
-                                selected_ships.append(ship)
-                                ship.is_selected = True
-                                
-                        dragging = False
-                
+        
         #Changes color of shop if hovered over
-        shop.is_hovered(mouse_pos)
+        if player1.settings.lower() == 'player':
+            shop.is_hovered(mouse_pos)
                 
         #Use global background setting for the game.
         if GlobalSettings.dark_background:
@@ -221,7 +181,10 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                 if s.health <= 0:
                     ship_list.remove(s)
                     ships.remove(s)
-                    GlobalSettings.shipcounts[s.player - 1] -= 1
+                    if s.player == 1:
+                        scoreboard.player1.ship_count -= 1
+                    if s.player == 2:
+                        scoreboard.player2.ship_count -= 1
 
 
         # Capture Logic: Check if any ship has reached its target planet.
@@ -240,7 +203,7 @@ def runGame(screen, cpu1_setting, cpu2_setting):
                         target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership
-                        if ship.player == GlobalSettings.curr_player:
+                        if ship.player == player1.player_num:
                             scoreboard.update_player_sps(target_planet.point_value)
                         else:
                             scoreboard.update_opponent_sps(target_planet.point_value)
@@ -258,25 +221,44 @@ def runGame(screen, cpu1_setting, cpu2_setting):
             
             if not has_ship_attacking:
                 planet.ship_attacking = False
+        
+        # Handles server stuff
+        if server_mode:
+            # Broadcast the game state to all clients
+            game_state = {
+                'planets': [planet.to_dict() for planet in planets],
+                'ships': [ship.to_dict() for ship in ships],
+                'scoreboard': scoreboard.get_scores()
+            }
+            broadcast(game_state)
+            
+            try:
+                data = b""
+                while True:
+                    part = server.recv(8192)
+                    data += part
+                    if len(part) < 8192:
+                        break
+                action = pickle.loads(data)
+                if action["type"] == "buy_ship":
+                    #Buys a ship at opponenets planet
+                    x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    x = planets[1].x + x_offset
+                    y = planets[1].y + y_offset
+                    ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
+                    scoreboard.update_opponent(-250)
+                    scoreboard.player2.ship_count += 1
+                if action["type"] == "select_planet":
+                    player2.target_planet = action["planet_id"]
+            except Exception as e:
+                print("[CLIENT] Disconnected from server:", e)
+                running = False
             
         scoreboard.draw(screen)
-        shop.draw(screen)
-        
-        #Draws and selects the rectangle for selcting ships
-        if dragging:
-            dragging_current_pos = pygame.mouse.get_pos()
-            
-            x, y = min(dragging_start_pos[0], dragging_current_pos[0]), min(dragging_start_pos[1], dragging_current_pos[1])
-            width = abs(dragging_current_pos[0] - dragging_start_pos[0])
-            height = abs(dragging_current_pos[1] - dragging_start_pos[1])
-
-            overlay = pygame.Surface((width, height), pygame.SRCALPHA)
-            overlay.fill((GlobalSettings.neutral_color[0], GlobalSettings.neutral_color[1], GlobalSettings.neutral_color[2], 100))
-
-            screen.blit(overlay, (x, y))
-
-            
-        
+        if player1.settings.lower() == 'player':
+            shop.draw(screen)
+     
         pygame.display.update()
         FramePerSec.tick(FPS)
 
@@ -291,7 +273,6 @@ def runGame(screen, cpu1_setting, cpu2_setting):
 
     return
 
-
 def pauseMenu(screen, WIDTH, HEIGHT):
     pause_font = pygame.font.Font(None, 72)
     option_font = pygame.font.Font(None, 48)
@@ -299,7 +280,13 @@ def pauseMenu(screen, WIDTH, HEIGHT):
     resume_text = option_font.render("Press R to Resume", True, GlobalSettings.neutral_color)
     quit_text = option_font.render("Press Q to Quit", True, GlobalSettings.neutral_color)
     
+    # Define volume slider variables.
+    volume_slider_rect = pygame.Rect(WIDTH // 2 - 110, HEIGHT // 2 + 150, 220, 10)
+    slider_handle_radius = 10
+    dragging_slider = False
+    
     paused = True
+    clock = pygame.time.Clock()
     while paused:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -309,12 +296,28 @@ def pauseMenu(screen, WIDTH, HEIGHT):
                     paused = False
                 elif event.key == pygame.K_q:  # Quit game
                     return "home"
-        
-        # Fill screen with background color based on current settings
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click only
+                    mouse = pygame.mouse.get_pos()
+                    if volume_slider_rect.collidepoint(mouse):
+                        dragging_slider = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    dragging_slider = False
+            elif event.type == pygame.MOUSEMOTION:
+                if dragging_slider:
+                    mouse_x = event.pos[0]
+                    relative_x = mouse_x - volume_slider_rect.x
+                    new_volume = relative_x / volume_slider_rect.width
+                    new_volume = max(0, min(new_volume, 1))  # Clamp between 0 and 1
+                    GlobalSettings.volume = new_volume
+                    pygame.mixer.music.set_volume(new_volume)
+
+        # Fill screen with background color based on current settings.
         bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
         screen.fill(bg_color)
         
-        # Draw pause texts
+        # Draw pause texts.
         pause_rect = pause_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
         resume_rect = resume_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
@@ -322,21 +325,33 @@ def pauseMenu(screen, WIDTH, HEIGHT):
         screen.blit(resume_text, resume_rect)
         screen.blit(quit_text, quit_rect)
         
+        # Draw volume slider bar.
+        pygame.draw.rect(screen, GlobalSettings.gray, volume_slider_rect)
+        # Calculate the handle's position based on the current volume.
+        handle_x = volume_slider_rect.x + int(GlobalSettings.volume * volume_slider_rect.width)
+        handle_y = volume_slider_rect.centery
+        mouse = pygame.mouse.get_pos()
+        handle_color = GlobalSettings.black if volume_slider_rect.collidepoint(mouse) else GlobalSettings.gray
+        pygame.draw.circle(screen, handle_color, (handle_x, handle_y), slider_handle_radius)
+        # Render the volume percentage above the slider bar.
+        vol_percentage = int(GlobalSettings.volume * 100)
+        vol_text = option_font.render(f"Volume: {vol_percentage}%", True, GlobalSettings.neutral_color)
+        vol_rect = vol_text.get_rect(midbottom=(volume_slider_rect.centerx, volume_slider_rect.y - 10))
+        screen.blit(vol_text, vol_rect)
+        
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
     
     return "resume"
 
+
 def checkForWinner(planets):
-    # Assume that a planet with player_num 0 is neutral.
-    # If all planets are owned by the same non-zero player, that player wins.
-    first_owner = planets[0].player_num
-    if first_owner == 0:
+    if planets[0].player_num == 2:
+        return 2
+    elif planets[1].player_num == 1:
+        return 1
+    else:
         return None
-    for planet in planets:
-        if planet.player_num != first_owner:
-            return None
-    return first_owner
 
 def winnerScreen(winner, screen, WIDTH, HEIGHT):
     clock = pygame.time.Clock()

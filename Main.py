@@ -7,12 +7,11 @@ import Settings
 import GlobalSettings
 from SelectionScreen import selection_screen
 from Game import runGame
-
+from Player import Player
+from Server import server
+from Client import client
 pygame.init()
 pygame.mixer.init()
-
-CPU_TURN_EVENT = pygame.USEREVENT + 2 # Custom event for CPU turn
-pygame.time.set_timer(CPU_TURN_EVENT, 1000)  # Fire the CPU logic every second
 
 # Load and play the background music
 pygame.mixer.music.load("Audio/gameMusic.mp3")
@@ -29,6 +28,9 @@ screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 
+player1 = Player(1, GlobalSettings.orange, 0, 'player')
+player2 = Player(2, GlobalSettings.blue, 1, 'player')
+
 def main(): 
     running = True
     while running:
@@ -44,25 +46,42 @@ def main():
         if option.lower() == "single player":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='single player')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'single player', player1, player2)
             if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() in "multiplayer":   
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='multiplayer')
-            if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
-                if res == "quit":
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
+            if res[0] == "multiplayer_menu":
+                option = "multiplayer" 
+                continue
+            elif res[0] != "home" and res[0].lower() == "server":
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                # Pass the entered host IP (res[3]) to the server function.
+                res_server = server(screen, player1, player2, res[3])
+                if res_server == "quit":
+                    running = False
+            elif res[0] != "home" and res[0].lower() == "client":
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                print("Your local IP is:", res[3])
+                res_client = client(screen, player1, player2, res[3])
+                if res_client == "quit":
                     running = False
         elif option.lower() in "computer":
             GlobalSettings.curr_player = 1
             GlobalSettings.opposing_player = 2
-            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, mode='computer')
+            res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'computer', player1, player2)
             if res[0] != "home":
-                res = runGame(screen, res[1], res[2])
+                player1.change_setting(res[1])
+                player2.change_setting(res[2])
+                res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() == "credits":
