@@ -60,17 +60,20 @@ def client(screen, player1, player2, server_ip):
                         }
 
         try:
-            client_socket.sendall(pickle.dumps(input_data))
-            data = b""
-            while True:
-                part = client_socket.recv(8192)
-                data += part
-                if len(part) < 8192:
-                    break
-            game_state_dict = pickle.loads(data)
-            planets = game_state_dict["planets"]
-            ships = game_state_dict["ships"]
-            scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+            send_msg(client_socket, input_data or {"type": "noop"})
+        except BrokenPipeError:
+            print("[CLIENT] Lost connection to server.")
+            break
+
+        # receive exactly one state update
+        game_state_dict = recv_msg(client_socket)
+        if game_state_dict is None:
+            print("[CLIENT] Server closed connection.")
+            break
+
+        planets = game_state_dict["planets"]
+        ships = game_state_dict["ships"]
+        scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
 
         # DRAW game_state
         screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
