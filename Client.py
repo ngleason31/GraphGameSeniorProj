@@ -3,6 +3,7 @@ import pickle
 import pygame
 from Shop import Shop
 from Planet import planet_loc, Planet
+from Scoreboard import Scoreboard
 from Ship import Ship
 import GlobalSettings
 
@@ -67,7 +68,7 @@ def client(screen, player1, player2, server_ip):
             game_state_dict = pickle.loads(data)
             planets = game_state_dict["planets"]
             ships = game_state_dict["ships"]
-            #scoreboard = game_state_dict["scoreboard"]
+            scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
 
             # DRAW game_state
             screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
@@ -80,7 +81,7 @@ def client(screen, player1, player2, server_ip):
                 
             for planet in draw_planets:
                 planet.draw(screen, draw_planets)
-            #scoreboard.draw(screen)
+            scoreboard.draw(screen)
             shop.is_hovered(mouse_pos)
             shop.draw(screen)
             

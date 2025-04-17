@@ -228,7 +228,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             game_state = {
                 'planets': [planet.serialize() for planet in planets],
                 'ships': [ship.serialize() for ship in ships],
-                'scoreboard': scoreboard.get_scores()
+                'scoreboard': scoreboard.serialize()
             }
             broadcast(game_state)
             
@@ -256,6 +256,8 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 running = False
             
         scoreboard.draw(screen)
+        scoreboard.update_shipcount(player1, player2)
+        
         if player1.settings.lower() == 'player':
             shop.draw(screen)
      
