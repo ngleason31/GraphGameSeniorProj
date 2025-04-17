@@ -226,8 +226,8 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         if server_mode:
             # Broadcast the game state to all clients
             game_state = {
-                'planets': [planet.to_dict() for planet in planets],
-                'ships': [ship.to_dict() for ship in ships],
+                'planets': [planet.serialize() for planet in planets],
+                'ships': [ship.serialize() for ship in ships],
                 'scoreboard': scoreboard.get_scores()
             }
             broadcast(game_state)

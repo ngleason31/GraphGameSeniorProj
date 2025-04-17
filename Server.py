@@ -25,7 +25,7 @@ def server(screen, player1, player2, host_ip):
 
     def broadcast_game_state(game_state):
         try:
-            state_data = pickle.dumps(game_state.to_dict())
+            state_data = pickle.dumps(game_state)
             for client in clients:
                 client.sendall(state_data)
         except Exception as e:
@@ -39,17 +39,15 @@ def server(screen, player1, player2, host_ip):
         print(f"[ERROR] Failed to bind to {host_ip}:{PORT} - {e}")
         return
     #server.bind((host_ip, PORT))
-    server_socket.listen(2)
+    server_socket.listen(1)
     print("[SERVER] Waiting for clients to connect...")
-
-    for i in range(2):
-        try:
-            conn, addr = server_socket.accept()
-            print(f"[SERVER] Player {i+1} connected from {addr}")
-            clients.append(conn)
-            threading.Thread(target=client_handler, args=(conn, i)).start()
-        except Exception as e:
-            print(f"[ERROR] Error accepting connection for Player {i+1}: {e}")
+    try:
+        conn, addr = server_socket.accept()
+        print(f"[SERVER] Player 2 connected from {addr}")
+        clients.append(conn)
+        threading.Thread(target=client_handler, args=(conn, 0)).start()
+    except Exception as e:
+        print(f"[ERROR] Error accepting connection for Player 2: {e}")
 
 
     runGame(
@@ -61,5 +59,5 @@ def server(screen, player1, player2, host_ip):
         server=server_socket
     )
 
-    server.close()
+    server_socket.close()
     print("[SERVER] Server socket closed.")

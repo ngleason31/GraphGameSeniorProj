@@ -104,8 +104,8 @@ class Planet:
             
 def planet_generator():
     #Start with a top left, center, and bottom left planet
-    player_planet = Planet(0, 150, 150, 30, GlobalSettings.curr_player, health=10000)
-    opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 30, GlobalSettings.opposing_player, health=10000)
+    player_planet = Planet(0, 150, 150, 30, 1, health=10000)
+    opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 30, 2, health=10000)
     
     planets = [player_planet, opposing_planet]
     num_planets = random.randint(80, 90) + 2
