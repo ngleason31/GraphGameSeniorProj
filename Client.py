@@ -29,6 +29,8 @@ def client(screen, player1, player2, server_ip):
     shop = Shop(triangle_color=GlobalSettings.blue)
     clicked_planet = None
     draw_planets = []  # Initial empty list for planets (will be updated from game state)
+    planets = []
+    ships = []
 
     while running:
         pygame.event.pump()
@@ -36,8 +38,6 @@ def client(screen, player1, player2, server_ip):
         mouse_pos = pygame.mouse.get_pos()
         mouse_x, mouse_y = mouse_pos
 
-        planets = []
-        ships = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -60,18 +60,17 @@ def client(screen, player1, player2, server_ip):
                         }
 
         try:
-            send_msg(client_socket, input_data or {"type": "noop"})
-        except BrokenPipeError:
-            print("[CLIENT] Lost connection to server.")
-            break
-
-        game_state_dict = recv_msg(client_socket)
-        if game_state_dict is None:
-            print("[CLIENT] Server closed connection.")
-            break
-        planets = game_state_dict["planets"]
-        ships = game_state_dict["ships"]
-        scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+            client_socket.sendall(pickle.dumps(input_data))
+            data = b""
+            while True:
+                part = client_socket.recv(8192)
+                data += part
+                if len(part) < 8192:
+                    break
+            game_state_dict = pickle.loads(data)
+            planets = game_state_dict["planets"]
+            ships = game_state_dict["ships"]
+            scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
 
         # DRAW game_state
         screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
