@@ -1,6 +1,7 @@
 # NetworkUtils.py
 import socket
 import pygame
+import pickle, struct
 
 def get_local_ip():
     """Return the system's local IP address."""
@@ -43,3 +44,32 @@ def get_ip_input(screen, prompt="Enter IP to bind to: ", font=None):
         screen.blit(prompt_surface, (20, 20))
         pygame.display.flip()
         clock.tick(30)
+
+def send_msg(sock, msg_obj):
+    raw = pickle.dumps(msg_obj)
+    header = struct.pack('!I', len(raw))   # 4‑byte unsigned int, network byte order
+    sock.sendall(header + raw)
+    
+def recv_all(sock, n):
+    buf = b''
+    while len(buf) < n:
+        chunk = sock.recv(n - len(buf))
+        if not chunk:
+            return None    # connection closed
+        buf += chunk
+    return buf
+
+def recv_msg(sock):
+    # 1) read 4‑byte length
+    hdr = recv_all(sock, 4)
+    if hdr is None:
+        return None
+    msg_len = struct.unpack('!I', hdr)[0]
+
+    # 2) read the full payload
+    raw = recv_all(sock, msg_len)
+    if raw is None:
+        return None
+
+    # 3) unpickle
+    return pickle.loads(raw)

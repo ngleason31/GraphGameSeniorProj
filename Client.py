@@ -6,6 +6,7 @@ from Planet import planet_loc, Planet
 from Scoreboard import Scoreboard
 from Ship import Ship
 import GlobalSettings
+from NetworkUtils import send_msg, recv_msg
 
 def client(screen, player1, player2, server_ip):
     HOST = server_ip 
@@ -59,39 +60,38 @@ def client(screen, player1, player2, server_ip):
                         }
 
         try:
-            client_socket.sendall(pickle.dumps(input_data))
-            data = b""
-            while True:
-                part = client_socket.recv(8192)
-                data += part
-                if len(part) < 8192:
-                    break
-            game_state_dict = pickle.loads(data)
-            planets = game_state_dict["planets"]
-            ships = game_state_dict["ships"]
-            scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+            send_msg(client_socket, input_data or {"type": "noop"})
+        except BrokenPipeError:
+            print("[CLIENT] Lost connection to server.")
+            break
 
-            # DRAW game_state
-            screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
+        game_state_dict = recv_msg(client_socket)
+        if game_state_dict is None:
+            print("[CLIENT] Server closed connection.")
+            break
+        planets = game_state_dict["planets"]
+        ships = game_state_dict["ships"]
+        scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
 
-            for planet_dict in planets:
-                draw_planets.append(Planet.deserialize(planet_dict))
-            for ship_dict in ships:
-                ship = Ship.deserialize(ship_dict)
-                ship.draw(screen)
+        # DRAW game_state
+        screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
+
+        for planet_dict in planets:
+            draw_planets.append(Planet.deserialize(planet_dict))
+        for ship_dict in ships:
+            ship = Ship.deserialize(ship_dict)
+            ship.draw(screen)
                 
-            for planet in draw_planets:
-                planet.draw(screen, draw_planets)
-            scoreboard.draw(screen)
-            shop.is_hovered(mouse_pos)
-            shop.draw(screen)
+        for planet in draw_planets:
+            planet.draw(screen, draw_planets)
+        scoreboard.draw(screen)
+        shop.is_hovered(mouse_pos)
+        shop.draw(screen)
             
 
-            pygame.display.flip()
-            clock.tick(60)
-        except Exception as e:
-            print("[CLIENT] Disconnected from server:", e)
-            return 'quit'
+        pygame.display.flip()
+        clock.tick(60)
+
 
     pygame.quit()
     client_socket.close()

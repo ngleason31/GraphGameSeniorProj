@@ -1,5 +1,5 @@
 import socket
-import threading
+from NetworkUtils import send_msg
 import pickle
 from Game import runGame
 
@@ -7,27 +7,12 @@ def server(screen, player1, player2, host_ip):
     #HOST = '0.0.0.0'
     PORT = 5555
     clients = []
-    inputs = [None, None]
 
-    def client_handler(conn, player_id):
-        while True:
-            try:
-                data = conn.recv(8192)
-                if not data:
-                    print(f"[SERVER] No data received from Player {player_id+1}. Disconnecting...")
-                    break
-                inputs[player_id] = pickle.loads(data)
-            except Exception as e:
-                print(f"[ERROR] Player {player_id+1} disconnected: {e}")
-                break
-        conn.close()
-        print(f"[SERVER] Connection with Player {player_id+1} closed.")
 
     def broadcast_game_state(game_state):
         try:
-            state_data = pickle.dumps(game_state)
             for client in clients:
-                client.sendall(state_data)
+                send_msg(client, game_state)
         except Exception as e:
             print(f"[ERROR] Failed to broadcast: {e}")
 
@@ -58,5 +43,6 @@ def server(screen, player1, player2, host_ip):
         server=conn
     )
 
+    conn.close()
     server_socket.close()
     print("[SERVER] Server socket closed.")
