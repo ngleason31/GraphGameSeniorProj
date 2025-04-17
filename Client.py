@@ -18,6 +18,7 @@ def client(screen, player1, player2, server_ip):
     #client.connect((HOST, PORT))
     try:
         client_socket.connect((HOST, PORT))
+        client_socket.sendall(pickle.dumps({"type": "hello", "player": 1}))
     except Exception as e:
         print("[CLIENT] Unable to connect to server:", e)
         return "quit"
