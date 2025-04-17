@@ -28,7 +28,6 @@ def client(screen, player1, player2, server_ip):
     running = True
     shop = Shop(triangle_color=GlobalSettings.blue)
     clicked_planet = None
-    draw_planets = []  # Initial empty list for planets (will be updated from game state)
     planets = []
     ships = []
 
@@ -78,8 +77,7 @@ def client(screen, player1, player2, server_ip):
         # DRAW game_state
         screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
 
-        for planet_dict in planets:
-            draw_planets.append(Planet.deserialize(planet_dict))
+        draw_planets = [Planet.deserialize(p) for p in planets]
         for ship_dict in ships:
             ship = Ship.deserialize(ship_dict)
             ship.draw(screen)
