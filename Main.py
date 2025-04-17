@@ -28,9 +28,6 @@ screen = pygame.display.set_mode((GlobalSettings.WIDTH, GlobalSettings.HEIGHT))
 pygame.display.set_caption("Graph Game")
 clock = pygame.time.Clock()
 
-player1 = Player(1, GlobalSettings.orange, 0, 'player')
-player2 = Player(2, GlobalSettings.blue, 1, 'player')
-
 def main(): 
     running = True
     while running:
@@ -48,8 +45,8 @@ def main():
             GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'single player', player1, player2)
             if res[0] != "home":
-                player1.change_setting(res[1])
-                player2.change_setting(res[2])
+                player1 = Player(1, GlobalSettings.orange, 0, res[1])
+                player2 = Player(2, GlobalSettings.blue, 1, res[2])
                 res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
@@ -61,15 +58,15 @@ def main():
                 option = "multiplayer" 
                 continue
             elif res[0] != "home" and res[0].lower() == "server":
-                player1.change_setting(res[1])
-                player2.change_setting(res[2])
+                player1 = Player(1, GlobalSettings.orange, 0, res[1])
+                player2 = Player(2, GlobalSettings.blue, 1, res[2])
                 # Pass the entered host IP (res[3]) to the server function.
                 res_server = server(screen, player1, player2, res[3])
                 if res_server == "quit":
                     running = False
             elif res[0] != "home" and res[0].lower() == "client":
-                player1.change_setting(res[1])
-                player2.change_setting(res[2])
+                player1 = Player(1, GlobalSettings.orange, 0, res[1])
+                player2 = Player(2, GlobalSettings.blue, 1, res[2])
                 print("Your Opponents local IP is:", res[3])
                 res_client = client(screen, player1, player2, res[3])
                 if res_client == "quit":
@@ -79,8 +76,8 @@ def main():
             GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'computer', player1, player2)
             if res[0] != "home":
-                player1.change_setting(res[1])
-                player2.change_setting(res[2])
+                player1 = Player(1, GlobalSettings.orange, 0, res[1])
+                player2 = Player(2, GlobalSettings.blue, 1, res[2])
                 res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False

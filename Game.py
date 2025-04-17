@@ -9,6 +9,7 @@ from Scoreboard import Scoreboard
 from Ship import Ship
 from Shop import Shop
 from pygame.locals import *
+from Player import Player
 import GlobalSettings
 
 FPS = 60
@@ -269,7 +270,9 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         if winner is not None:
             result = winnerScreen(winner, screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
             if result == "play_again":
-                return runGame()
+                player1 = Player(1, GlobalSettings.orange, 0, player1.settings)
+                player2 = Player(2, GlobalSettings.blue, 1, player2.settings)
+                return runGame(screen, player1, player2, server_mode, broadcast, server)
             elif result == "home":
                 return "home"
 
