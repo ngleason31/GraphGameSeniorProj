@@ -45,7 +45,6 @@ def server(screen, player1, player2, host_ip):
         conn, addr = server_socket.accept()
         print(f"[SERVER] Player 2 connected from {addr}")
         clients.append(conn)
-        threading.Thread(target=client_handler, args=(conn, 0)).start()
     except Exception as e:
         print(f"[ERROR] Error accepting connection for Player 2: {e}")
 
