@@ -28,6 +28,8 @@ def client(screen, player1, player2, server_ip):
     shop = Shop(triangle_color=GlobalSettings.blue)
     clicked_planet = None
     draw_planets = []  # Initial empty list for planets (will be updated from game state)
+    planets = []
+    ships = []
 
     while running:
         pygame.event.pump()
@@ -35,8 +37,6 @@ def client(screen, player1, player2, server_ip):
         mouse_pos = pygame.mouse.get_pos()
         mouse_x, mouse_y = mouse_pos
 
-        planets = []
-        ships = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -59,6 +59,10 @@ def client(screen, player1, player2, server_ip):
                         }
 
         try:
+            if not input_data:
+                input_data = {
+                            "type": "nothing"
+                        }
             client_socket.sendall(pickle.dumps(input_data))
             data = b""
             while True:
@@ -66,10 +70,11 @@ def client(screen, player1, player2, server_ip):
                 data += part
                 if len(part) < 8192:
                     break
-            game_state_dict = pickle.loads(data)
-            planets = game_state_dict["planets"]
-            ships = game_state_dict["ships"]
-            scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+            if data:
+                game_state_dict = pickle.loads(data)
+                planets = game_state_dict["planets"]
+                ships = game_state_dict["ships"]
+                scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
 
             # DRAW game_state
             screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
