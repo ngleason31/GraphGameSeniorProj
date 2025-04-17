@@ -47,14 +47,14 @@ def main():
             GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'single player', player1, player2)
             if res[0] != "home":
-                player1 = Player(1, GlobalSettings.orange, 0, res[1])
-                player2 = Player(2, GlobalSettings.blue, 1, res[2])
+                player1.change_setting(res[2])
+                player2.change_setting(res[2])
                 res = runGame(screen, player1, player2)
                 if res == "quit":
                     running = False
         elif option.lower() in "multiplayer":
-            player1.change_setting(res[1])
-            player2.change_setting(res[2])
+            player1 = Player(1, GlobalSettings.orange, 0, 'player')
+            player2 = Player(2, GlobalSettings.blue, 1, 'player')
             GlobalSettings.curr_player = 2
             GlobalSettings.opposing_player = 1
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
@@ -62,8 +62,8 @@ def main():
                 option = "multiplayer" 
                 continue
             elif res[0] != "home" and res[0].lower() == "server":
-                player1 = Player(1, GlobalSettings.orange, 0, res[1])
-                player2 = Player(2, GlobalSettings.blue, 1, res[2])
+                player1.change_setting(res[2])
+                player2.change_setting(res[2])
                 # Pass the entered host IP (res[3]) to the server function.
                 res_server = server(screen, player1, player2, res[3])
                 if res_server == "quit":
