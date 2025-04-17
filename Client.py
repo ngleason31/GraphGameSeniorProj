@@ -2,7 +2,8 @@ import socket
 import pickle
 import pygame
 from Shop import Shop
-from Planet import planet_loc
+from Planet import planet_loc, Planet
+from Ship import Ship
 import GlobalSettings
 
 def client(screen, player1, player2, server_ip):
@@ -18,19 +19,22 @@ def client(screen, player1, player2, server_ip):
         client_socket.connect((HOST, PORT))
     except Exception as e:
         print("[CLIENT] Unable to connect to server:", e)
-        return
+        return "quit"
     
 
     running = True
     shop = Shop(triangle_color=GlobalSettings.blue)
     clicked_planet = None
-    planets = []  # Initial empty list for planets (will be updated from game state)
+    draw_planets = []  # Initial empty list for planets (will be updated from game state)
 
     while running:
         pygame.event.pump()
         input_data = {}
         mouse_pos = pygame.mouse.get_pos()
+        mouse_x, mouse_y = mouse_pos
 
+        planets = []
+        ships = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -43,7 +47,7 @@ def client(screen, player1, player2, server_ip):
                 if event.button == 3:
                     if clicked_planet:
                         clicked_planet.selected = False
-                        clicked_planet = planet_loc(mouse_pos.x, mouse_pos.y, planets)
+                        clicked_planet = planet_loc(mouse_x, mouse_y, planets)
                     if clicked_planet:
                         player2.target_planet = clicked_planet.id
                         clicked_planet.selected = True
@@ -53,27 +57,30 @@ def client(screen, player1, player2, server_ip):
                         }
 
         try:
-            client.sendall(pickle.dumps(input_data))
+            client_socket.sendall(pickle.dumps(input_data))
             data = b""
             while True:
-                part = client.recv(8192)
+                part = client_socket.recv(8192)
                 data += part
                 if len(part) < 8192:
                     break
             game_state_dict = pickle.loads(data)
             planets = game_state_dict["planets"]
             ships = game_state_dict["ships"]
-            scoreboard = game_state_dict["scoreboard", None]
+            #scoreboard = game_state_dict["scoreboard"]
 
             # DRAW game_state
             screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)
 
-            for planet in planets:
-                planet.draw(screen, planets)
-            for ship in ships:
+            for planet_dict in planets:
+                draw_planets.append(Planet.deserialize(planet_dict))
+            for ship_dict in ships:
+                ship = Ship.deserialize(ship_dict)
                 ship.draw(screen)
                 
-            scoreboard.draw(screen)
+            for planet in draw_planets:
+                planet.draw(screen, draw_planets)
+            #scoreboard.draw(screen)
             shop.is_hovered(mouse_pos)
             shop.draw(screen)
             
@@ -82,7 +89,7 @@ def client(screen, player1, player2, server_ip):
             clock.tick(60)
         except Exception as e:
             print("[CLIENT] Disconnected from server:", e)
-            running = False
+            return 'quit'
 
     pygame.quit()
-    client.close()
+    client_socket.close()

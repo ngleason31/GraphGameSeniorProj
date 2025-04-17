@@ -70,7 +70,7 @@ def main():
             elif res[0] != "home" and res[0].lower() == "client":
                 player1.change_setting(res[1])
                 player2.change_setting(res[2])
-                print("Your local IP is:", res[3])
+                print("Your Opponents local IP is:", res[3])
                 res_client = client(screen, player1, player2, res[3])
                 if res_client == "quit":
                     running = False
