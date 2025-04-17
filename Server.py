@@ -56,7 +56,7 @@ def server(screen, player1, player2, host_ip):
         player2=player2,
         server_mode=True,
         broadcast=broadcast_game_state,
-        server=server_socket
+        server=conn
     )
 
     server_socket.close()
