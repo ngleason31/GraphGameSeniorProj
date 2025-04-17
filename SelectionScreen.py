@@ -151,6 +151,8 @@ def selection_screen(screen, width, height, mode, player1, player2):
                             
                     # Join option: show local IP
                     if join_button_rect.collidepoint(mouse):
+                        bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
+                        screen.fill(bg_color)
                         from NetworkUtils import get_local_ip
                         server_ip = get_ip_input(screen, prompt="Enter server IP to join: ", font=font)
                         return ['client', 'player', 'player', server_ip]

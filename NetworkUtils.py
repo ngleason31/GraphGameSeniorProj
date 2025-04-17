@@ -51,13 +51,23 @@ def send_msg(sock, msg_obj):
     sock.sendall(header + raw)
     
 def recv_all(sock, n):
-    buf = b''
-    while len(buf) < n:
-        chunk = sock.recv(n - len(buf))
+    """Receive exactly n bytes from sock, or return None on EOF/error."""
+    data = bytearray()
+    remaining = n
+    while remaining > 0:
+        # ask for at most 4 KiB at a time
+        to_read = min(4096, remaining)
+        try:
+            chunk = sock.recv(to_read)
+        except socket.error as e:
+            print(f"[NetworkUtils] recv error: {e}")
+            return None
         if not chunk:
-            return None    # connection closed
-        buf += chunk
-    return buf
+            # peer closed connection before sending everything
+            return None
+        data.extend(chunk)
+        remaining -= len(chunk)
+    return bytes(data)
 
 def recv_msg(sock):
     # 1) read 4‑byte length
