@@ -19,7 +19,7 @@ def client(screen, player1, player2, server_ip):
     #client.connect((HOST, PORT))
     try:
         client_socket.connect((HOST, PORT))
-        client_socket.sendall(pickle.dumps({"type": "hello", "player": 1}))
+        send_msg(client_socket, {"type": "hello", "player": 1})
     except Exception as e:
         print("[CLIENT] Unable to connect to server:", e)
         return "quit"
@@ -59,12 +59,6 @@ def client(screen, player1, player2, server_ip):
                             "planet_id": clicked_planet.id
                         }
 
-        try:
-            send_msg(client_socket, input_data or {"type": "noop"})
-        except BrokenPipeError:
-            print("[CLIENT] Lost connection to server.")
-            break
-
         # receive exactly one state update
         game_state_dict = recv_msg(client_socket)
         if game_state_dict is None:
@@ -74,6 +68,12 @@ def client(screen, player1, player2, server_ip):
         planets = game_state_dict["planets"]
         ships = game_state_dict["ships"]
         scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+        
+        try:
+            send_msg(client_socket, input_data or {"type": "noop"})
+        except BrokenPipeError:
+            print("[CLIENT] Lost connection to server.")
+            break
 
         # DRAW game_state
         screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)

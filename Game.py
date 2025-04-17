@@ -227,13 +227,6 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         # Handles server stuff
         if server_mode:
             # Broadcast the game state to all clients
-            game_state = {
-                'planets': [planet.serialize() for planet in planets],
-                'ships': [ship.serialize() for ship in ships],
-                'scoreboard': scoreboard.serialize()
-            }
-            broadcast(game_state)
-            
             action  = recv_msg(server)
             if action["type"] == "buy_ship":
                 #Buys a ship at opponenets planet
@@ -246,6 +239,13 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 player2.ship_count += 1
             if action["type"] == "select_planet":
                 player2.target_planet = action["planet_id"]
+                
+            game_state = {
+                'planets': [planet.serialize() for planet in planets],
+                'ships': [ship.serialize() for ship in ships],
+                'scoreboard': scoreboard.serialize()
+            }
+            broadcast(game_state)
 
             
         scoreboard.draw(screen)
