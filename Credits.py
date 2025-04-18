@@ -1,9 +1,11 @@
 import pygame
-import sys
 import GlobalSettings
 
 def runCredits(screen, WIDTH, HEIGHT):
-    # Set up a screen for the credits. Adjust WIDTH/HEIGHT as needed.
+    '''
+    Displays the credits screen and handles scrolling text.
+    '''
+    
     pygame.display.set_caption("Credits")
     
     clock = pygame.time.Clock()
@@ -32,7 +34,8 @@ def runCredits(screen, WIDTH, HEIGHT):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit" 
-
+            
+        # Sets the background based on the settings.
         if GlobalSettings.dark_background:
             bg_color = GlobalSettings.dark_mode_bg
             text_color = GlobalSettings.dark_mode_details
@@ -57,10 +60,12 @@ def runCredits(screen, WIDTH, HEIGHT):
         if y_offset + len(credits) * 40 < 0:
             running = False
 
+    # After credits, display a button to return to the home screen.
     button_rect = pygame.Rect(WIDTH // 2 - 110 , HEIGHT // 2 - 50, 230, 50)
     button_font = pygame.font.Font(None, 36)
     waiting = True
 
+    # Screen after credits.
     while waiting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -75,6 +80,7 @@ def runCredits(screen, WIDTH, HEIGHT):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
+        # Logic for the button.
         if button_rect.collidepoint(mouse):
             pygame.draw.rect(screen, (100, 100, 100), button_rect)
             if click[0] == 1:
@@ -82,6 +88,7 @@ def runCredits(screen, WIDTH, HEIGHT):
         else:
             pygame.draw.rect(screen, (150, 150, 150), button_rect)
         
+        # Renders the button.
         button_text = button_font.render("Return to Home", True, (255, 255, 255))
         button_text_rect = button_text.get_rect(center=button_rect.center)
         screen.blit(button_text, button_text_rect)
@@ -90,7 +97,4 @@ def runCredits(screen, WIDTH, HEIGHT):
         clock.tick(FPS)
     
     return "home"
-
-if __name__ == "__main__":
-    runCredits()
 
