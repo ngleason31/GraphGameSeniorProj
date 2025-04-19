@@ -97,8 +97,8 @@ def selection_screen(screen, width, height, mode, player1, player2):
     continue_button_rect = pygame.Rect(width // 2 - 100 , height - 300, 200, 50)
     
     # Host/Join button definitions.
-    host_button_rect = pygame.Rect(width // 2 - 100, height - 500, 200, 50)
-    join_button_rect = pygame.Rect(width // 2 - 100 , height - 400, 200, 50)
+    host_button_rect = pygame.Rect(width // 2 - 100, height - 400, 200, 50)
+    join_button_rect = pygame.Rect(width // 2 - 100 , height - 300, 200, 50)
     
     # Selection definitions.
     player1_rect = pygame.Rect(width // 2 - 600, 200, 400, 100)
@@ -185,7 +185,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
 
                 # Non-multiplayer (or additional) handling.
                 # Returns the computer settings for later use.
-                if continue_button_rect.collidepoint(mouse):
+                if mode.lower() != 'multiplayer' and continue_button_rect.collidepoint(mouse):
                     if mode.lower() == 'single player':
                         return ['game', 'player', dropdown_menu2.options[dropdown_menu2.selected_index]]
                     if mode.lower() == 'computer':
@@ -207,11 +207,6 @@ def selection_screen(screen, width, height, mode, player1, player2):
                 pygame.draw.rect(screen, GlobalSettings.black, return_button_rect)
             else:
                 pygame.draw.rect(screen, GlobalSettings.gray, return_button_rect)
-
-            if continue_button_rect.collidepoint(mouse):
-                pygame.draw.rect(screen, GlobalSettings.black, continue_button_rect)
-            else:
-                pygame.draw.rect(screen, GlobalSettings.gray, continue_button_rect)
                 
             # Draws selction sides.
             pygame.draw.rect(screen, GlobalSettings.gray, player1_rect)
@@ -310,7 +305,16 @@ def selection_screen(screen, width, height, mode, player1, player2):
             screen.blit(return_surface, return_rect)
 
             draw_shaded_button(screen, return_button_rect, "Return to Home", font)
-            draw_shaded_button(screen, continue_button_rect, "Play Game", font)
+            # Draw Play Game only if not in multiplayer
+            if mode.lower() != 'multiplayer':
+                # hover effect
+                if continue_button_rect.collidepoint(mouse):
+                    pygame.draw.rect(screen, GlobalSettings.black, continue_button_rect)
+                else:
+                    pygame.draw.rect(screen, GlobalSettings.gray, continue_button_rect)
+
+                # label
+                draw_shaded_button(screen, continue_button_rect, "Play Game", font)
 
             pygame.display.flip()
             clock.tick(FPS)
