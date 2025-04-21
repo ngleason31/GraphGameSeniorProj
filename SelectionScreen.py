@@ -179,8 +179,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
                             pygame.display.flip()
                             clock.tick(FPS)
 
-                        return ['client', player1.current_setting,
-                                player2.current_setting, server_ip]
+                        return ['client', 'player', 'player', server_ip]
 
                 # Non-multiplayer (or additional) handling.
                 # Returns the computer settings for later use.
