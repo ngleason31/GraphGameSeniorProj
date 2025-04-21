@@ -60,7 +60,7 @@ def client(screen, player1, player2, server_ip):
                     if clicked_planet:
                         clicked_planet.selected = False
                     # Finds the clicked planet and sets it as the target planet for player2.
-                    clicked_planet = planet_loc(mouse_x, mouse_y, planets)
+                    clicked_planet = planet_loc(mouse_x, mouse_y, draw_planets)
                     if clicked_planet:
                         player2.target_planet = clicked_planet.id
                         clicked_planet.selected = True

@@ -242,18 +242,19 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         if server_mode:
             # receives the action from the client.
             action  = recv_msg(server)
-            if action["type"] == "buy_ship":
-                # Buys a ship at opponenets planet.
-                x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
-                y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
-                x = planets[1].x + x_offset
-                y = planets[1].y + y_offset
-                ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
-                scoreboard.update_opponent(-250)
-                player2.ship_count += 1
-            if action["type"] == "select_planet":
-                # Figures out what was selected by the client.
-                player2.target_planet = action["planet_id"]
+            if action != None:
+                if action["type"] == "buy_ship":
+                    # Buys a ship at opponenets planet.
+                    x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                    x = planets[1].x + x_offset
+                    y = planets[1].y + y_offset
+                    ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
+                    scoreboard.update_opponent(-250)
+                    player2.ship_count += 1
+                if action["type"] == "select_planet":
+                    # Figures out what was selected by the client.
+                    player2.target_planet = action["planet_id"]
             
             # Sends the game state to the client.
             game_state = {
