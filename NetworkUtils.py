@@ -53,7 +53,7 @@ def get_ip_input(screen, prompt="Enter IP to bind to: ", font=None):
 
 def send_msg(sock, msg_obj):
     '''Sends a message with a 4-byte header.'''
-    raw = pickle.dumps(msg_obj)
+    raw = pickle.dumps(msg_obj, protocol=pickle.HIGHEST_PROTOCOL)
     header = struct.pack('!I', len(raw))   # 4‑byte unsigned int, network byte order
     sock.sendall(header + raw)
     
