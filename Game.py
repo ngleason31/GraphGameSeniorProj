@@ -227,7 +227,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                     # Normal capture logic.
                     if target_planet.health >= 0:
                         # If there are multiple ships, apply damage to the target planet.
-                        damage = 4 + 0.2 * len(ship_list)
+                        damage = 2 + 0.2 * len(ship_list)
                         target_planet.change_health(-damage)
                         target_planet.ship_attacking = True
                     else:
