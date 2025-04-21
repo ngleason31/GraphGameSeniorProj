@@ -1,5 +1,4 @@
 import pygame
-import sys
 import GlobalSettings
 
 def runSettings(screen, WIDTH, HEIGHT):

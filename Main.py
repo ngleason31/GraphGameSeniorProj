@@ -67,8 +67,8 @@ def main():
             # Initializes the players for multiplayer mode (two human players).
             player1 = Player(1, GlobalSettings.orange, 0, 'player')
             player2 = Player(2, GlobalSettings.blue, 1, 'player')
-            GlobalSettings.curr_player = 2
-            GlobalSettings.opposing_player = 1
+            GlobalSettings.curr_player = 1
+            GlobalSettings.opposing_player = 2
             res = selection_screen(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, 'multiplayer', player1, player2)
             # Added for client/server screens
             if res[0] == "multiplayer_menu":
