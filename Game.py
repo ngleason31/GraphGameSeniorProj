@@ -152,6 +152,10 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 conflict_planet = planets[planet_id]
                 conflict_planet.ship_attacking = True
             if len(owners) < 2:
+                # Heals ships not in conflict.
+                for ship in ship_list:
+                    if ship.health < ship.max_health:
+                        ship.health = min(ship.health + 0.01, ship.max_health)
                 continue  # no conflict if only one (or zero) owners.
 
             # There's a conflict => pause capturing on this planet.
@@ -178,7 +182,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 # If the user has more ships, CPU is outnumbered => CPU gets multiplier.
                 # If equal, both do base damage.
                 if difference > 0:
-                    multiplier = 1.0 + 0.1 * difference
+                    multiplier = 1.0 + 0.6 * difference
                     if c_count > u_count:
                         # user is outnumbered => user ships get extra damage.
                         for ship in user_ships:

@@ -29,7 +29,15 @@ class Ship:
         
         # Gets the triangle points for the ship, and then draws the ship
         triangle_points = [(self.x, self.y - self.size), (self.x - self.size, self.y + self.size), (self.x + self.size, self.y + self.size)]
-        pygame.draw.polygon(screen, GlobalSettings.player_colors[self.player], triangle_points, width=3)
+        
+        # Ships have a red tint based on their health.
+        color =  GlobalSettings.player_colors[self.player]
+        damage = (self.max_health - self.health) / self.max_health
+        r = int(color[0] * (1 - damage) + 255 * damage)
+        g = int(color[1] * (1 - damage))
+        b = int(color[2] * (1 - damage))
+        color = (r, g, b)
+        pygame.draw.polygon(screen, color, triangle_points, width=3)
     
     def get_position(self):
         '''
