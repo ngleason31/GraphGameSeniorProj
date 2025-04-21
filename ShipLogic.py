@@ -95,9 +95,15 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
         # Finds the best planet to move to, which is not owned by the CPU player, and the shortest distance away.
         for candidate_planet in non_cpu_planets:
             distance = math.sqrt((current_planet.x - candidate_planet.x) ** 2 +(current_planet.y - candidate_planet.y) ** 2)
-            if candidate_planet.point_value >= best_value and distance < best_distance:
+            
+            # Sets home planets to 4.5 so that it takes all the 5s and 6s before attacking home planets
+            point_value = candidate_planet.point_value
+            if point_value == 8:
+                point_value = 4.5
+            
+            if point_value >= best_value and distance < best_distance:
                 player.target_planet = candidate_planet.id
-                best_value = candidate_planet.point_value
+                best_value = point_value
                 best_distance = distance
 
     def lowest_scoring_first():
