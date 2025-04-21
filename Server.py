@@ -66,6 +66,7 @@ def server(screen, player1, player2, host_ip):
         else:
             bg_color = GlobalSettings.light_mode_bg
             detail_color = GlobalSettings.light_mode_details
+            
         screen.fill(bg_color)
         txt = font.render("Waiting for Player 2 to connect…", True, detail_color)
         screen.blit(txt, (screen.get_width()//2 - txt.get_width()//2,
@@ -76,7 +77,11 @@ def server(screen, player1, player2, host_ip):
                              screen.get_height()//2 - 20))
 
         pygame.draw.rect(screen, (200,0,0), cancel_btn)
-        lbl = font.render("Cancel", True, (255,255,255))
+        pos = pygame.mouse.get_pos()
+        cancel_color = GlobalSettings.black if cancel_btn.collidepoint(pos) else GlobalSettings.gray
+        pygame.draw.rect(screen, cancel_color, cancel_btn)
+
+        lbl = font.render("Cancel", True, GlobalSettings.white)
         screen.blit(lbl, lbl.get_rect(center=cancel_btn.center))
 
         pygame.display.flip()

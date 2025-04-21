@@ -148,7 +148,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
                         # immediately hand off to server()
                         return ['server', 'player', 'player', host_ip]
 
-                    # Join Game
+                    # Join Game 
                     if join_button_rect.collidepoint(mouse):
                         server_ip = ''
                         input_active = True
