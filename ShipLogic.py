@@ -101,7 +101,7 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
             if point_value == 8:
                 point_value = 4.5
             
-            if point_value >= best_value and distance < best_distance:
+            if point_value > best_value or (point_value == best_value and distance < best_distance):
                 player.target_planet = candidate_planet.id
                 best_value = point_value
                 best_distance = distance

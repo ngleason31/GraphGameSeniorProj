@@ -216,30 +216,23 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
 
 
         # Capture Logic: Check if any ship has reached its target planet.
-        for ship in ships:
-            target_planet = planets[ship.curr_planet]
-            distance = math.hypot(ship.x - target_planet.x, ship.y - target_planet.y)
-
-            # "Conflict check": if ship_attacking is True, skip capturing.
-            if distance < target_planet.radius:
-                # Are we in conflict? If so, skip capturing.
-                in_conflict = target_planet.ship_attacking
-                if not in_conflict and target_planet.player_num != ship.player:
-                    # normal capture logic.
+        for planet_id, ship_list in planet_ship_map.items():
+            target_planet = planets[planet_id]
+            owners = set(s.player for s in ship_list)
+            
+            # Only one ship owner => capture logic.
+            if len(owners) == 1:
+                player_num = owners.pop()
+                if target_planet.player_num != player_num:
+                    # Normal capture logic.
                     if target_planet.health >= 0:
-                        if len(ship_list) > 1:
-                            # If there are multiple ships, apply damage to the target planet.
-                            damage = -1 * 0.5 * len(ship_list)
-                            target_planet.change_health(damage)
-                            target_planet.ship_attacking = True
-                        else:
-                            # If there is only one ship, apply a larger damage to the target planet.
-                            damage = -1
-                            target_planet.change_health(damage)
-                            target_planet.ship_attacking = True
+                        # If there are multiple ships, apply damage to the target planet.
+                        damage = 1 + 0.5 * len(ship_list)
+                        target_planet.change_health(-damage)
+                        target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership.
-                        if ship.player == player1.player_num:
+                        if player_num == player1.player_num:
                             scoreboard.update_player_sps(target_planet.point_value)
                         else:
                             scoreboard.update_opponent_sps(target_planet.point_value)
@@ -251,13 +244,6 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         for planet in planets:
             if not planet.ship_attacking and planet.health < planet.max_health:
                 planet.change_health(5)
-            has_ship_attacking = False
-            for ship in ships:
-                if ship.curr_planet == planet.id:
-                    has_ship_attacking == True
-            
-            if not has_ship_attacking:
-                planet.ship_attacking = False
                 
         # Check for a winner after each frame.
         winner = checkForWinner(planets)
