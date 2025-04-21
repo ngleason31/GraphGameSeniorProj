@@ -237,6 +237,9 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             
             if not has_ship_attacking:
                 planet.ship_attacking = False
+                
+        # Check for a winner after each frame.
+        winner = checkForWinner(planets)
         
         # Handles server logic.
         if server_mode:
@@ -244,14 +247,15 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             action  = recv_msg(server)
             if action != None:
                 if action["type"] == "buy_ship":
-                    # Buys a ship at opponenets planet.
-                    x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
-                    y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
-                    x = planets[1].x + x_offset
-                    y = planets[1].y + y_offset
-                    ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
-                    scoreboard.update_opponent(-250)
-                    player2.ship_count += 1
+                    if scoreboard.opponent_score >= 250 and player2.ship_count < GlobalSettings.ship_limit:
+                        # Buys a ship at opponenets planet.
+                        x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                        y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
+                        x = planets[1].x + x_offset
+                        y = planets[1].y + y_offset
+                        ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
+                        scoreboard.update_opponent(-250)
+                        player2.ship_count += 1
                 if action["type"] == "select_planet":
                     # Figures out what was selected by the client.
                     player2.target_planet = action["planet_id"]
@@ -260,7 +264,8 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             game_state = {
                 'planets': [planet.serialize() for planet in planets],
                 'ships': [ship.serialize() for ship in ships],
-                'scoreboard': scoreboard.serialize()
+                'scoreboard': scoreboard.serialize(),
+                'Winner': winner
             }
             broadcast(game_state)
 
@@ -276,8 +281,6 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         pygame.display.update()
         FramePerSec.tick(FPS)
 
-        # Check for a winner after each frame.
-        winner = checkForWinner(planets)
         if winner is not None:
             # Sends to winner screen
             result = winnerScreen(winner, screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)

@@ -2,10 +2,12 @@ import socket
 import pygame
 from Shop import Shop
 from Planet import planet_loc, Planet
+from Player import Player
 from Scoreboard import Scoreboard
 from Ship import Ship
 import GlobalSettings
 from NetworkUtils import send_msg, recv_msg
+from Game import winnerScreen
 
 def client(screen, player1, player2, server_ip):
     '''
@@ -15,6 +17,9 @@ def client(screen, player1, player2, server_ip):
     # Initalizes the client socket based on the ip and port.
     HOST = server_ip 
     PORT = 5555
+    
+    # Result for the client.
+    result = None
 
     pygame.init()
     clock = pygame.time.Clock()
@@ -80,6 +85,12 @@ def client(screen, player1, player2, server_ip):
         planets = game_state_dict["planets"]
         ships = game_state_dict["ships"]
         scoreboard = Scoreboard.deserialize(game_state_dict["scoreboard"])
+        winner = game_state_dict["winner"]
+        
+        if winner:
+            # If there is a winner, show the winner screen and exit.
+            result = winnerScreen(screen, winner, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            break
         
         # Tries to send something to the server.
         try:
@@ -108,5 +119,10 @@ def client(screen, player1, player2, server_ip):
 
 
     # Closes the socket and quits pygame.
-    pygame.quit()
     client_socket.close()
+    pygame.quit()
+    
+    if result == "play_again":
+        player1 = Player(1, GlobalSettings.orange, 0, player1.settings)
+        player2 = Player(2, GlobalSettings.blue, 1, player2.settings)
+        client(screen, player1, player2, server_ip)
