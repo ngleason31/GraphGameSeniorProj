@@ -223,8 +223,20 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 if not in_conflict and target_planet.player_num != ship.player:
                     # normal capture logic.
                     if target_planet.health >= 0:
-                        target_planet.change_health(-3)
-                        target_planet.ship_attacking = True
+                        if len(ship_list) > 1:
+                            # If there are multiple ships, apply damage to the target planet.
+                            damage = -1 * len(ship_list)
+                            target_planet.change_health(damage)
+                            target_planet.ship_attacking = True
+                        else:
+                            # If there is only one ship, apply a larger damage to the target planet.
+                            damage = -1
+                            target_planet.change_health(damage)
+                            target_planet.ship_attacking = True
+                        # damage = -3 * len(ship_list)
+                        # damage = 0.5 * damage
+                        # target_planet.change_health(damage)
+                        # target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership.
                         if ship.player == player1.player_num:
@@ -233,6 +245,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                             scoreboard.update_opponent_sps(target_planet.point_value)
                         target_planet.change_player(ship.player)
                         target_planet.ship_attacking = False
+        
             
         #Planets heal if not under attack.        
         for planet in planets:
