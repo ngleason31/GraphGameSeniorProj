@@ -149,18 +149,15 @@ def planet_generator():
     opposing_planet = Planet(1, GlobalSettings.WIDTH - 150, GlobalSettings.HEIGHT - 150, 40, 2, health=10000)
     
     planets = [player_planet, opposing_planet]
-    num_planets = random.randint(80, 90) + 2
+    num_planets = random.randint(80, 90)
     
     # Generates planets that are at least close to another planet, but far enough from all planets not to overlap.
-    for id in range(num_planets - 2):
+    for id in range(2, num_planets):
         # Randomizes the radius of the planet.
         radius = random.randint(15, 30)
         
-        # Only allows for a certain number of attempts (debugging purposes).
-        attempts = 0
         planet_found = False
-        while not planet_found and attempts < 1000:
-            attempts += 1
+        while not planet_found:
             
             # Randomizes the x and y coordinates of the planet.
             x = random.randint(150, GlobalSettings.WIDTH - 150)
@@ -174,10 +171,11 @@ def planet_generator():
                 if planet_distance <= 80:
                     planet_found = False
                     break
-                
+            
             # If the planet is not too close or too far from another planet, add it to the list.
             if planet_found:
-                planets.append(Planet(id + 2, x, y, radius))
+                planets.append(Planet(id, x, y, radius))
+            
     
     # Creates the connections between planets.
     num_actual_planets = len(planets)
