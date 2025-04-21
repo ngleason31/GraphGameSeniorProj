@@ -1,56 +1,98 @@
 import socket
-import threading
-import pickle
+import pygame
+from NetworkUtils import send_msg
 from Game import runGame
+import GlobalSettings
 
 def server(screen, player1, player2, host_ip):
-    #HOST = '0.0.0.0'
+    '''
+    Handles the server side with a loading screen and console logs.
+    '''
+
     PORT = 5555
-    clients = []
-    inputs = [None, None]
+    client = None
 
-    def client_handler(conn, player_id):
-        while True:
-            try:
-                data = conn.recv(8192)
-                if not data:
-                    print(f"[SERVER] No data received from Player {player_id+1}. Disconnecting...")
-                    break
-                inputs[player_id] = pickle.loads(data)
-            except Exception as e:
-                print(f"[ERROR] Player {player_id+1} disconnected: {e}")
-                break
-        conn.close()
-        print(f"[SERVER] Connection with Player {player_id+1} closed.")
-
-    def broadcast_game_state(game_state):
-        try:
-            state_data = pickle.dumps(game_state.to_dict())
-            for client in clients:
-                client.sendall(state_data)
-        except Exception as e:
-            print(f"[ERROR] Failed to broadcast: {e}")
-
-
+    # — bind & listen —
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         server_socket.bind((host_ip, PORT))
+        server_socket.listen(1)
+        server_socket.setblocking(False)    # non‑blocking accept()
     except Exception as e:
-        print(f"[ERROR] Failed to bind to {host_ip}:{PORT} - {e}")
+        print(f"[ERROR] Failed to bind/listen on {host_ip}:{PORT} - {e}")
         return
-    #server.bind((host_ip, PORT))
-    server_socket.listen(2)
-    print("[SERVER] Waiting for clients to connect...")
 
-    for i in range(2):
+    # — console logs —
+    print(f"[SERVER] Hosting on {host_ip} on port {PORT}...")
+    print(f"[SERVER] Listening for Player 2...")
+
+    # — prepare loading‑screen UI —
+    font = pygame.font.Font(None, 36)
+    cancel_btn = pygame.Rect(
+        screen.get_width()//2 - 60,
+        screen.get_height()//2 + 40,
+        120, 40
+    )
+    waiting = True
+
+    # — loading‑screen loop —
+    while waiting:
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT:
+                server_socket.close()
+                pygame.quit()
+                return
+            elif ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+                if cancel_btn.collidepoint(ev.pos):
+                    server_socket.close()
+                    return
+
+        # try to accept
         try:
             conn, addr = server_socket.accept()
-            print(f"[SERVER] Player {i+1} connected from {addr}")
-            clients.append(conn)
-            threading.Thread(target=client_handler, args=(conn, i)).start()
-        except Exception as e:
-            print(f"[ERROR] Error accepting connection for Player {i+1}: {e}")
+        except BlockingIOError:
+            conn = None
 
+        if conn:
+            print(f"[SERVER] Player 2 connected from {addr}")
+            client = conn
+            waiting = False
+            break
+
+        # draw loading screen
+        if GlobalSettings.dark_background:
+            bg_color = GlobalSettings.dark_mode_bg
+            detail_color = GlobalSettings.dark_mode_details
+        else:
+            bg_color = GlobalSettings.light_mode_bg
+            detail_color = GlobalSettings.light_mode_details
+            
+        screen.fill(bg_color)
+        txt = font.render("Waiting for Player 2 to connect…", True, detail_color)
+        screen.blit(txt, (screen.get_width()//2 - txt.get_width()//2,
+                          screen.get_height()//2 - 60))
+
+        ip_txt = font.render(f"IP: {host_ip}", True, detail_color)
+        screen.blit(ip_txt, (screen.get_width()//2 - ip_txt.get_width()//2,
+                             screen.get_height()//2 - 20))
+
+        pygame.draw.rect(screen, (200,0,0), cancel_btn)
+        pos = pygame.mouse.get_pos()
+        cancel_color = GlobalSettings.black if cancel_btn.collidepoint(pos) else GlobalSettings.gray
+        pygame.draw.rect(screen, cancel_color, cancel_btn)
+
+        lbl = font.render("Cancel", True, GlobalSettings.white)
+        screen.blit(lbl, lbl.get_rect(center=cancel_btn.center))
+
+        pygame.display.flip()
+        pygame.time.delay(100)
+
+    # — on connect, run the game —
+    def broadcast_game_state(game_state):
+        try:
+            send_msg(client, game_state)
+        except Exception as e:
+            print(f"[ERROR] Failed to broadcast: {e}")
 
     runGame(
         screen=screen,
@@ -58,8 +100,9 @@ def server(screen, player1, player2, host_ip):
         player2=player2,
         server_mode=True,
         broadcast=broadcast_game_state,
-        server=server_socket
+        server=client
     )
 
-    server.close()
+    client.close()
+    server_socket.close()
     print("[SERVER] Server socket closed.")
