@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from pygame.locals import *
 import StartScreen
 import Credits
@@ -14,8 +15,20 @@ from Client import client
 pygame.init()
 pygame.mixer.init()
 
+
+def resource_path(relative_path):
+    """ 
+    Get absolute path to resource, for the exe
+    """
+    
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # Load and play the background music
-pygame.mixer.music.load("Audio/gameMusic.mp3")
+pygame.mixer.music.load(resource_path('Audio/gameMusic.mp3'))
 pygame.mixer.music.play(-1)
 GlobalSettings.update_audio()
 

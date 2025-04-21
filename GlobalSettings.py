@@ -3,9 +3,9 @@ import pygame
 # This file contains global settings for the game, including colors, audio settings, and player configurations.
 
 # Settings;
-audio_on = False  
+audio_on = True
 dark_background = True 
-volume = 1.0
+volume = 0.5
 
 # Screen Settings.
 WIDTH = 0
