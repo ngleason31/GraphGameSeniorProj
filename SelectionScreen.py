@@ -145,35 +145,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
                         host_ip = get_local_ip()
 
                         # Define a button for confirming the host start.
-                        showing_ip = True
-                        start_host_rect = pygame.Rect(width // 2 - 100, height - 200, 200, 50)
-                        cancel_button_rect = pygame.Rect(width // 2 - 100, height - 120, 200, 50)
-                        
-                        while showing_ip:
-                            # Use dark or light mode background and shows IP.
-                            bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
-                            screen.fill(bg_color)
-                            ip_display = font.render(f"Your IP: {host_ip}", True, (255, 255, 255))
-                            screen.blit(ip_display, (20, 20))
-                            
-                            # Buttons for hosting the game.
-                            draw_shaded_button(screen, start_host_rect, "Start Hosting", font)
-                            draw_shaded_button(screen, cancel_button_rect, "Back", font)
-                            pygame.display.flip()
-                            clock.tick(FPS)
-
-                            # Special events for host menu.
-                            for ev in pygame.event.get():
-                                if ev.type == pygame.QUIT:
-                                    return ["multiplayer_menu", None, None]
-                                elif ev.type == pygame.KEYDOWN:
-                                    if ev.key == pygame.K_ESCAPE:  # Press Escape to cancel waiting
-                                        return ["multiplayer_menu", None, None]
-                                elif ev.type == pygame.MOUSEBUTTONDOWN:
-                                    if start_host_rect.collidepoint(ev.pos):
-                                        showing_ip = False
-                                    elif cancel_button_rect.collidepoint(ev.pos):
-                                        return ["multiplayer_menu", None, None]
+                        # immediately hand off to server()
                         return ['server', 'player', 'player', host_ip]
                             
                     # Join option: show local IP
