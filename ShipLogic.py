@@ -129,21 +129,21 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
             # Checks if the planet is not owned by the CPU player and not already in queue.
             if planets[connection].player_num != player.player_num and connection not in player.bfs:
                 player.bfs.appendleft(connection)
-            # Goes to the next planet in the queue (which is the least recent planet added to the queue).
-            player.target_planet = player.bfs.pop()
+        # Goes to the next planet in the queue (which is the least recent planet added to the queue).
+        player.target_planet = player.bfs.pop()
                     
     def dfs():
         '''
         Helper function which allows the ships to travel with dfs.
         '''
         
-        # Uses bfs to find the next planet to move to (visited is if it is taken over yet).
+        # Uses dfs to find the next planet to move to (visited is if it is taken over yet).
         for connection in planets[player.prev_target].connections:
             # Checks if the planet is not owned by the CPU player and not already in queue.
             if planets[connection].player_num != player.player_num and connection not in player.dfs:
                 player.dfs.append(connection)
-            # Goes to the next planet in the queue (which is the most recent planet added to the queue).
-            player.target_planet = player.dfs.pop()
+        # Goes to the next planet in the queue (which is the most recent planet added to the queue).
+        player.target_planet = player.dfs.pop()
                 
     def ship_logic(ship):
         '''
@@ -157,10 +157,14 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                 player.prev_target = player.target_planet
             player.target_planet = None
             return
-        #If the ship is at the target planet, but it is not owned by the CPU player, it will stop moving.
+        # If the ship is at the target planet, but it is not owned by the CPU player, it will stop moving.
         elif player.target_planet == ship.curr_planet and planets[ship.curr_planet].player_num != player.player_num:
             return
         else:
+            # If the ship has an enemy ship on the current planet, it will stop moving.
+            for enemy_ship in ships:
+                if enemy_ship.player != player.player_num and enemy_ship.curr_planet == ship.curr_planet:
+                    return
             # Step towards target planet using the next step helper function.
             next_step_id = next_step(ship.curr_planet, player.target_planet, planets)
             ship.set_target(planets[next_step_id])
