@@ -22,7 +22,10 @@ green = (0, 255, 0)
 red = (255, 0, 0)
 
 # Ship Limit.
-ship_limit = 2000
+ship_limit = 1000
+
+# Ship Price.
+ship_price = 200
 
 # Dark Mode Colors.
 dark_mode_bg = (80, 80, 80)

@@ -10,6 +10,7 @@ from Shop import Shop
 from pygame.locals import *
 from Player import Player
 import GlobalSettings
+from Debug import DebugConsole
 from NetworkUtils import recv_msg
 
 FPS = 60
@@ -27,6 +28,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
     scoreboard = Scoreboard()
     scoreboard.update_player_sps(planets[0].point_value)
     scoreboard.update_opponent_sps(planets[1].point_value)
+    console = DebugConsole()
     shop = Shop()
     clicked_planet = None
     
@@ -62,6 +64,9 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         mouse_x, mouse_y = mouse_pos
         
         for event in pygame.event.get():
+            # Handles the console input.
+            console.handle_typing(event, player1, player2, planets, ships)
+            
             if event.type == QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
@@ -70,6 +75,9 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                     result = pauseMenu(screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
                     if result == "home":
                         return "home"
+                if event.key == pygame.K_LCTRL:
+                    # Toggles the debug console.
+                    console.toggle()
                     
             # Only activates mouse clickes if a player is playing
             elif event.type == MOUSEBUTTONDOWN and player1.settings.lower() == 'player':
@@ -272,6 +280,9 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
         # Draws and updates the scoreboard.
         scoreboard.draw(screen)
         scoreboard.update_shipcount(player1, player2)
+        
+        # Draws the console if it is active.
+        console.draw(screen)
         
         # Only draws the shop if a player is playing.
         if player1.settings.lower() == 'player':
