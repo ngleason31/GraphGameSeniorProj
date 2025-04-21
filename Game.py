@@ -233,10 +233,6 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                             damage = -1
                             target_planet.change_health(damage)
                             target_planet.ship_attacking = True
-                        # damage = -3 * len(ship_list)
-                        # damage = 0.5 * damage
-                        # target_planet.change_health(damage)
-                        # target_planet.ship_attacking = True
                     else:
                         # Planet changes ownership.
                         if ship.player == player1.player_num:
