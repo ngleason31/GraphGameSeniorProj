@@ -8,16 +8,16 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
     def cpu_purchase_logic():
         '''Helper function which buys ships for the CPU player.'''
         
-        # If a CPU player has more than 250 points, it will buy ships until it reaches the ship limit or runs out of points.
-        while scoreboard.get_scores()[player.player_num - 1] >= 250 and player.ship_count < GlobalSettings.ship_limit:
+        # If a CPU player has more than the ship price it will buy ships until it reaches the ship limit or runs out of points.
+        while scoreboard.get_scores()[player.player_num - 1] >= GlobalSettings.ship_price and player.ship_count < GlobalSettings.ship_limit:
             x_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
             y_offset = random.randint(-home_planet.radius + 15, home_planet.radius - 15)
             ships.append(Ship(home_planet.x + x_offset, home_planet.y + y_offset,
                 home_planet.id, player=player.player_num))
             if player.player_num == GlobalSettings.opposing_player:
-                scoreboard.update_opponent(-250)
+                scoreboard.update_opponent(-GlobalSettings.ship_price)
             else:
-                scoreboard.update_player(-250)
+                scoreboard.update_player(-GlobalSettings.ship_price)
             player.ship_count += 1
                         
     def best_move_first():

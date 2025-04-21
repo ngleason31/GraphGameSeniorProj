@@ -83,14 +83,14 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             elif event.type == MOUSEBUTTONDOWN and player1.settings.lower() == 'player':
                 if event.button == 1:
                     # Logic for buying ships
-                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= 250 and player1.ship_count < GlobalSettings.ship_limit:
+                    if shop.is_clicked(mouse_pos) and scoreboard.player_score >= GlobalSettings.ship_price and player1.ship_count < GlobalSettings.ship_limit:
                         #Buys a ship at original planet (with an offset).
                         x_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         y_offset = random.randint(-planets[0].radius + 15, planets[0].radius - 15)
                         x = planets[0].x + x_offset
                         y = planets[0].y + y_offset
                         ships.append(Ship(x, y, 0, player=GlobalSettings.curr_player))
-                        scoreboard.update_player(-250)
+                        scoreboard.update_player(-GlobalSettings.ship_price)
                         player1.ship_count += 1
                 if event.button == 3:
                     # Logic for selecting a planet (Right click).
@@ -255,14 +255,14 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             action  = recv_msg(server)
             if action != None:
                 if action["type"] == "buy_ship":
-                    if scoreboard.opponent_score >= 250 and player2.ship_count < GlobalSettings.ship_limit:
+                    if scoreboard.opponent_score >= GlobalSettings.ship_price and player2.ship_count < GlobalSettings.ship_limit:
                         # Buys a ship at opponenets planet.
                         x_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
                         y_offset = random.randint(-planets[1].radius + 15, planets[1].radius - 15)
                         x = planets[1].x + x_offset
                         y = planets[1].y + y_offset
                         ships.append(Ship(x, y, 1, player=GlobalSettings.opposing_player))
-                        scoreboard.update_opponent(-250)
+                        scoreboard.update_opponent(-GlobalSettings.ship_price)
                         player2.ship_count += 1
                 if action["type"] == "select_planet":
                     # Figures out what was selected by the client.
