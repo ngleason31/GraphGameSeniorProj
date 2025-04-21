@@ -79,7 +79,7 @@ def client(screen, player1, player2, server_ip):
         game_state_dict = recv_msg(client_socket)
         if game_state_dict is None:
             print("[CLIENT] Server closed connection.")
-            break
+            return "home"
         
         # Deserialize game state data.
         planets = game_state_dict["planets"]
@@ -97,7 +97,7 @@ def client(screen, player1, player2, server_ip):
             send_msg(client_socket, input_data or {"type": "noop"})
         except BrokenPipeError:
             print("[CLIENT] Lost connection to server.")
-            break
+            return "home"
 
         # Draws the game.
         screen.fill(GlobalSettings.light_mode_bg if not GlobalSettings.dark_background else GlobalSettings.dark_mode_bg)

@@ -22,7 +22,7 @@ green = (0, 255, 0)
 red = (255, 0, 0)
 
 # Ship Limit.
-ship_limit = 500
+ship_limit = 250
 
 # Ship Price.
 ship_price = 200
