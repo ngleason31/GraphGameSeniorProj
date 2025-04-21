@@ -273,7 +273,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                 'planets': [planet.serialize() for planet in planets],
                 'ships': [ship.serialize() for ship in ships],
                 'scoreboard': scoreboard.serialize(),
-                'Winner': winner
+                'winner': winner
             }
             broadcast(game_state)
 

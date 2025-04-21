@@ -59,22 +59,13 @@ def send_msg(sock, msg_obj):
     
 def recv_all(sock, n):
     '''Receive exactly n bytes from sock, or return None on EOF/error.'''
+    
     data = bytearray()
-    remaining = n
-    while remaining > 0:
-        # Asks for at most 4 KiB at a time.
-        to_read = min(4096, remaining)
-        try:
-            chunk = sock.recv(to_read)
-        except socket.error as e:
-            print(f"[NetworkUtils] recv error: {e}")
-            return None
+    while len(data) < n:
+        chunk = sock.recv(n - len(data))
         if not chunk:
-            # Peer closed connection before sending everything.
-            return None
+            raise EOFError(f"Expected {n} bytes, got only {len(data)} before EOF")
         data.extend(chunk)
-        remaining -= len(chunk)
-    # Returns the data.
     return bytes(data)
 
 def recv_msg(sock):
@@ -82,16 +73,20 @@ def recv_msg(sock):
     Receive a message with a 4-byte header, and unpickle it.
     '''
     
-    # Reads the header of 4‑byte length.
-    hdr = recv_all(sock, 4)
-    if hdr is None:
-        return None
-    msg_len = struct.unpack('!I', hdr)[0]
+    try:
+        # Reads the 4-byte header.
+        hdr = recv_all(sock, 4)
+        msg_len = struct.unpack('!I', hdr)[0]
+        # Reads the payload.
+        raw = recv_all(sock, msg_len)
+        # Sanity Check
+        if len(raw) != msg_len:
+            print(f"[recv_msg] Warning: expected {msg_len} payload bytes, got {len(raw)}")
+        # Unpickle.
+        return pickle.loads(raw)
 
-    # Reads the full payload.
-    raw = recv_all(sock, msg_len)
-    if raw is None:
+    except Exception as e:
+        # Dump the first few bytes of the raw data for debugging.
+        snippet = raw[:10] if 'raw' in locals() else hdr
+        print(f"[recv_msg] failed to load pickle, first bytes: {snippet!r}, error: {e}")
         return None
-
-    # Unpickles the data.
-    return pickle.loads(raw)
