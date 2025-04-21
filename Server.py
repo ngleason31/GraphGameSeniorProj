@@ -2,6 +2,7 @@ import socket
 import pygame
 from NetworkUtils import send_msg
 from Game import runGame
+import GlobalSettings
 
 def server(screen, player1, player2, host_ip):
     '''
@@ -59,12 +60,18 @@ def server(screen, player1, player2, host_ip):
             break
 
         # draw loading screen
-        screen.fill((30, 30, 30))
-        txt = font.render("Waiting for Player 2 to connect…", True, (255,255,255))
+        if GlobalSettings.dark_background:
+            bg_color = GlobalSettings.dark_mode_bg
+            detail_color = GlobalSettings.dark_mode_details
+        else:
+            bg_color = GlobalSettings.light_mode_bg
+            detail_color = GlobalSettings.light_mode_details
+        screen.fill(bg_color)
+        txt = font.render("Waiting for Player 2 to connect…", True, detail_color)
         screen.blit(txt, (screen.get_width()//2 - txt.get_width()//2,
                           screen.get_height()//2 - 60))
 
-        ip_txt = font.render(f"IP: {host_ip}", True, (255,255,255))
+        ip_txt = font.render(f"IP: {host_ip}", True, detail_color)
         screen.blit(ip_txt, (screen.get_width()//2 - ip_txt.get_width()//2,
                              screen.get_height()//2 - 20))
 
