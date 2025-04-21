@@ -1,6 +1,6 @@
 import socket
 import pygame
-import pickle, struct
+import pickle, struct, zlib
 import GlobalSettings
 
 def get_local_ip():
@@ -54,8 +54,11 @@ def get_ip_input(screen, prompt="Enter IP to bind to: ", font=None):
 def send_msg(sock, msg_obj):
     '''Sends a message with a 4-byte header.'''
     raw = pickle.dumps(msg_obj, protocol=pickle.HIGHEST_PROTOCOL)
-    header = struct.pack('!I', len(raw))   # 4‑byte unsigned int, network byte order
-    sock.sendall(header + raw)
+    comp = zlib.compress(raw)
+    header = struct.pack('!I', len(comp))   # 4‑byte unsigned int, network byte order
+    sock.sendall(header)
+    sock.sendall(comp)
+
     
 def recv_all(sock, n):
     '''Receive exactly n bytes from sock, or return None on EOF/error.'''
@@ -80,15 +83,17 @@ def recv_msg(sock):
         hdr = recv_all(sock, 4)
         msg_len = struct.unpack('!I', hdr)[0]
         # Reads the payload.
-        raw = recv_all(sock, msg_len)
+        comp = recv_all(sock, msg_len)
         # Sanity Check
-        if len(raw) != msg_len:
-            print(f"[recv_msg] Warning: expected {msg_len} payload bytes, got {len(raw)}")
+        if len(comp) != msg_len:
+            print(f"[recv_msg] Warning: expected {msg_len} payload bytes, got {len(comp)}")
         # Unpickle.
+        
+        raw = zlib.decompress(comp)
         return pickle.loads(raw)
 
     except Exception as e:
         # Dump the first few bytes of the raw data for debugging.
-        snippet = raw[:10] if 'raw' in locals() else hdr
+        snippet = comp[:10] if 'comp' in locals() else hdr
         print(f"[recv_msg] failed to load pickle, first bytes: {snippet!r}, error: {e}")
         return None
