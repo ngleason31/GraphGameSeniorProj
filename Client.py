@@ -102,7 +102,7 @@ def client(screen, player1, player2, server_ip):
         
         if winner:
             # If there is a winner, show the winner screen and exit.
-            result = winnerScreen(screen, winner, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            result = winnerScreen(winner, screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, server_mode=True)
             break
         
         # Tries to send something to the server.

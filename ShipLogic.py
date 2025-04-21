@@ -167,6 +167,8 @@ def handle_turn(setting, scoreboard, planets, ships, home_planet, player):
                     return
             # Step towards target planet using the next step helper function.
             next_step_id = next_step(ship.curr_planet, player.target_planet, planets)
+            if next_step_id == None:
+                return
             ship.set_target(planets[next_step_id])
 
     # Checks if the logic is a human or cpu player for purchasing ships.
