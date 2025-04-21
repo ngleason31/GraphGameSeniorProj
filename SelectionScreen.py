@@ -147,13 +147,39 @@ def selection_screen(screen, width, height, mode, player1, player2):
                         # Define a button for confirming the host start.
                         # immediately hand off to server()
                         return ['server', 'player', 'player', host_ip]
-                            
-                    # Join option: show local IP
+
+                    # Join Game
                     if join_button_rect.collidepoint(mouse):
-                        bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
-                        screen.fill(bg_color)
-                        server_ip = get_ip_input(screen, prompt="Enter server IP to join: ", font=font)
-                        return ['client', 'player', 'player', server_ip]
+                        server_ip = ''
+                        input_active = True
+                        cancel_rect  = pygame.Rect(width//2 - 100, height - 120, 200, 50)
+
+                        while input_active:
+                            for ev2 in pygame.event.get():
+                                if ev2.type == pygame.QUIT:
+                                    return ['multiplayer_menu', None, None]
+                                elif ev2.type == pygame.KEYDOWN:
+                                    if ev2.key == pygame.K_RETURN:
+                                        input_active = False
+                                    elif ev2.key == pygame.K_BACKSPACE:
+                                        server_ip = server_ip[:-1]
+                                    else:
+                                        server_ip += ev2.unicode
+                                elif ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
+                                    if cancel_rect.collidepoint(ev2.pos):
+                                        return ['multiplayer_menu', None, None]
+
+                            # Draw join prompt
+                            bg_color = GlobalSettings.dark_mode_bg if GlobalSettings.dark_background else GlobalSettings.light_mode_bg
+                            screen.fill(bg_color)
+                            prompt_surface = font.render(f'Enter server IP: {server_ip}', True, (255, 255, 255))
+                            screen.blit(prompt_surface, (20, 20))
+                            draw_shaded_button(screen, cancel_rect,  'Cancel',  font)
+                            pygame.display.flip()
+                            clock.tick(FPS)
+
+                        return ['client', player1.current_setting,
+                                player2.current_setting, server_ip]
 
                 # Non-multiplayer (or additional) handling.
                 # Returns the computer settings for later use.
