@@ -152,7 +152,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
                     if join_button_rect.collidepoint(mouse):
                         server_ip = ''
                         input_active = True
-                        cancel_rect  = pygame.Rect(width//2 - 100, height - 120, 200, 50)
+                        cancel_rect  = pygame.Rect(width//2 - 100, height - 220, 200, 50)
 
                         while input_active:
                             for ev2 in pygame.event.get():
@@ -174,7 +174,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
                             screen.fill(bg_color)
                             prompt_surface = font.render(f'Enter server IP: {server_ip}', True, (255, 255, 255))
                             screen.blit(prompt_surface, (20, 20))
-                            draw_shaded_button(screen, cancel_rect,  'Cancel',  font)
+                            draw_shaded_button(screen, cancel_rect, 'Cancel', font)
                             pygame.display.flip()
                             clock.tick(FPS)
 
