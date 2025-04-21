@@ -107,7 +107,7 @@ def selection_screen(screen, width, height, mode, player1, player2):
     player2_box = pygame.Rect(width // 2 + 490, 215, 70, 70)
     
     # Sets the dropdown menus.
-    cpu_options = ['Best Move First', 'Worst Move First', 'Highest Scoring First', 'Lowest Scoring First', 'DFS', 'BFS']
+    cpu_options = ['DFS', 'BFS', 'Best Move First', 'Worst Move First', 'Highest Scoring First', 'Lowest Scoring First']
     difficulty_options = ['Easy', 'Medium', 'Hard']
     
     dropdown_menu1 = Dropdown(width // 2 - 600, 350, 400, 50, cpu_options, "Select settings for Computer 1:", font)
