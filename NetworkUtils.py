@@ -72,6 +72,8 @@ def recv_msg(sock):
     '''
     Receive a message with a 4-byte header, and unpickle it.
     '''
+    hdr = b''
+    raw = b''
     
     try:
         # Reads the 4-byte header.
