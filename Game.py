@@ -303,7 +303,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
 
         if winner is not None:
             # Sends to winner screen
-            result = winnerScreen(winner, screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT)
+            result = winnerScreen(winner, screen, GlobalSettings.WIDTH, GlobalSettings.HEIGHT, server_mode)
             if result == "play_again":
                 # Resets game.
                 player1 = Player(1, GlobalSettings.orange, 0, player1.settings)
@@ -410,7 +410,7 @@ def checkForWinner(planets):
     # If no one has won yet, return None.
         return None
 
-def winnerScreen(winner, screen, WIDTH, HEIGHT):
+def winnerScreen(winner, screen, WIDTH, HEIGHT, server_mode=False):
     '''
     Displays the winner screen with options to play again or go home.
     '''
@@ -433,7 +433,7 @@ def winnerScreen(winner, screen, WIDTH, HEIGHT):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Checks if the user clicked on the play again or home button.
                 mouse = pygame.mouse.get_pos()
-                if play_again_button.collidepoint(mouse):
+                if not server_mode and play_again_button.collidepoint(mouse):
                     return "play_again"
                 if home_button.collidepoint(mouse):
                     return "home"
@@ -448,10 +448,11 @@ def winnerScreen(winner, screen, WIDTH, HEIGHT):
         mouse = pygame.mouse.get_pos()
 
         # Draw Play Again button with hover effect.
-        if play_again_button.collidepoint(mouse):
-            pygame.draw.rect(screen, GlobalSettings.black, play_again_button)
-        else:
-            pygame.draw.rect(screen, GlobalSettings.gray, play_again_button)
+        if not server_mode:
+            if play_again_button.collidepoint(mouse):
+                pygame.draw.rect(screen, GlobalSettings.black, play_again_button)
+            else:
+                pygame.draw.rect(screen, GlobalSettings.gray, play_again_button)
 
         # Draw Home button with hover effect.
         if home_button.collidepoint(mouse):
@@ -466,7 +467,8 @@ def winnerScreen(winner, screen, WIDTH, HEIGHT):
         play_again_rect = play_again_text.get_rect(center=play_again_button.center)
         home_rect = home_text.get_rect(center=home_button.center)
         
-        screen.blit(play_again_text, play_again_rect)
+        if not server_mode:
+            screen.blit(play_again_text, play_again_rect)
         screen.blit(home_text, home_rect)
         
         pygame.display.flip()

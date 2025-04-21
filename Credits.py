@@ -13,6 +13,10 @@ def runCredits(screen, WIDTH, HEIGHT):
 
     # Define the credits text lines.
     credits = [
+        "CIS4914 Senior Project",
+        "Graph Game",
+        "Spring 2025",
+        "",
         "   DEVELOPERS:",
         "   Caleb Everett",
         "   Nico Gleason",
