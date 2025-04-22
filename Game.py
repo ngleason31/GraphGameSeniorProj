@@ -236,7 +236,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                             scoreboard.update_player_sps(target_planet.point_value)
                         else:
                             scoreboard.update_opponent_sps(target_planet.point_value)
-                        target_planet.change_player(ship.player)
+                        target_planet.change_player(player_num)
                         target_planet.ship_attacking = False
         
             
