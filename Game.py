@@ -242,7 +242,7 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
             
         #Planets heal if not under attack.        
         for planet in planets:
-            if not planet.ship_attacking and planet.health < planet.max_health:
+            if (planet.id not in planet_ship_map or not planet.ship_attacking) and planet.health < planet.max_health:
                 planet.change_health(5)
                 
         # Check for a winner after each frame.
