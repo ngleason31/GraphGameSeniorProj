@@ -1,4 +1,0 @@
-([('main',
-   '/Users/calebeverett/Desktop/VSCode '
-   'Projects/GraphGame/GraphGameSeniorProj/dist/main',
-   'EXECUTABLE')],)

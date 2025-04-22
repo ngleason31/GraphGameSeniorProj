@@ -236,13 +236,13 @@ def runGame(screen, player1, player2, server_mode=False, broadcast=None, server=
                             scoreboard.update_player_sps(target_planet.point_value)
                         else:
                             scoreboard.update_opponent_sps(target_planet.point_value)
-                        target_planet.change_player(ship.player)
+                        target_planet.change_player(player_num)
                         target_planet.ship_attacking = False
         
             
         #Planets heal if not under attack.        
         for planet in planets:
-            if not planet.ship_attacking and planet.health < planet.max_health:
+            if (planet.id not in planet_ship_map or not planet.ship_attacking) and planet.health < planet.max_health:
                 planet.change_health(5)
                 
         # Check for a winner after each frame.
